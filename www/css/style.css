@@ -1,0 +1,69 @@
+
+        /* Pagination */
+.pagination {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.pagination li {
+  display: inline-block;
+  margin-right: 5px;
+}
+
+.pagination li a {
+  display: inline-block;
+  padding: 5px 10px;
+  background-color: #f5f5f5;
+  color: #333;
+  text-decoration: none;
+}
+
+.pagination li a:hover {
+  background-color: #ccc;
+}
+
+/* Styles spécifiques pour chaque article */
+.article {
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: #f5f5f5;
+}
+
+.article h3 {
+  font-size: 18px;
+  color: #333;
+}
+
+.article p {
+  font-size: 14px;
+  color: #666;
+}
+
+.article .author {
+  font-size: 12px;
+  color: #999;
+}
+
+/* Bouton "Voir plus" */
+.article .read-more-btn {
+  display: inline-block;
+  padding: 5px 10px;
+  background-color: #333;
+  color: #fff;
+  text-decoration: none;
+}
+
+.article .read-more-btn:hover {
+  background-color: #555;
+}
+
+/* Barre de commentaires */
+.comment-bar {
+  background-color: #f5f5f5;
+  padding: 10px;
+}
+
+
+
+
+

@@ -1,0 +1,148 @@
+default:
+  controller: Main
+  action: home
+
+a-propos:
+  controller: Main
+  action: aboutUs
+
+about-us:
+  controller: Main
+  action: aboutUs
+
+contact:
+  controller: Main
+  action: contact
+
+ 
+
+login:
+  controller: Auth
+  action: login
+
+mail:
+  controller: Auth
+  action: mail
+
+logout:
+  controller: Auth
+  action: logout
+
+register:
+  controller: Auth
+  action: register
+
+dashboard:
+  controller: Dashboard
+  action: index
+
+verify:
+  controller: Auth
+  action: verify
+
+users:
+    controller: User
+    action: read
+
+user/create:
+    path: /user/create
+    controller: User
+    action: create
+
+user/update:
+    path: /user/update/{id}
+    controller: User
+    action: update
+
+user/delete:
+    path: /user/delete/{id}
+    controller: User
+    action: delete
+
+
+articles:
+    controller: Article
+    action: read
+    
+article/create:
+    controller: Article
+    action: create
+
+article/update:
+    controller: Article
+    action: update
+
+article/delete:
+    controller: Article
+    action: delete
+
+
+
+pages:
+    controller: Pages
+    action: read
+    
+pages/create:
+    controller: Pages
+    action: create
+
+pages/update:
+    controller: Pages
+    action: update
+
+pages/delete:
+    controller: Pages
+    action: delete
+
+comments:
+    controller: Comment
+    action: read
+        
+comment/create:
+    controller: Comment
+    action: create
+
+comment/approve:
+  path: /comment/approve/{id}
+  controller: Comment
+  action: approve
+
+comment/delete:
+    path: /comment/delete/{id}
+    controller: Comment
+    action: delete
+
+comment/show:
+    path: /article/show/{id}
+    controller: Comment
+    action: show    
+ 
+
+article/show:
+    path: /article/show/{id}
+    controller: Article
+    action: show
+
+pages/publish:
+    path: /pages/publish/{id}
+    controller: Pages
+    action: publish
+
+pages/unpublish:
+    path: /pages/unpublish/{id}
+    controller: Pages
+    action: unpublish
+
+
+pages/{slug}:
+    controller: Pages
+    action: show
+
+
+#dashboard/changeTheme:
+ # controller: Dashboard
+#  action: changeTheme
+
+# STEP 1 : ajotuer la nouvelle route
+# STEP 2 : créer la fonction dans le controller désigné dans la route
+# STEP 1 : créer un ficher X.form.php dans lequel tu décris les configs
