@@ -137,13 +137,13 @@ class Auth
             $mail->Host = "mailcatcher";
             $mail->IsHTML(true);
             $mail->AddAddress($email, "recipient-name");
-            $mail->SetFrom("lisa_admin@myges.fr", "from-name");
+            $mail->SetFrom("jphayek@myges.fr", "from-name");
             $mail->Subject = "Test Subject";
             
             // Construire le lien de vérification.
             // Supposons que votre méthode de vérification soit accessible à l'URL /verify et prenne un paramètre token.
             //$verifyLink = "http://localhost/verify?token=$verificationToken";
-            $verifyLink = "http://blogesgi.svp.com/verify?token=$verificationToken";
+            $verifyLink = "http://localhost/verify?token=$verificationToken";
             $content = "<p>Cliquez sur le lien suivant pour valider votre compte: <a href=\"$verifyLink\">$verifyLink</a></p>";
             
             $mail->MsgHTML($content);
