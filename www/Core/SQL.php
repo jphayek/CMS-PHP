@@ -117,7 +117,15 @@ public function getAllPages()
     $queryPrepared = $this->pdo->prepare("SELECT * FROM ".$this->table);
     $queryPrepared->setFetchMode(\PDO::FETCH_CLASS, get_called_class());
     $queryPrepared->execute();
-    return $queryPrepared->fetchAll();
+    return $queryPrepared->fetchAll(\PDO::FETCH_ASSOC);
+
+    foreach ($pages as &$page) {
+        $page['url'] = $this->generateUrl($page); // Générer l'URL
+        $page['lastmod'] = $this->generateLastmod($page); // Générer la date de modification
+        $page['changefreq'] = $this->generateChangefreq($page); // Générer la fréquence de changement
+        $page['priority'] = $this->generatePriority($page); // Générer la priorité
+    }
+    return $pages;
 }
 
 
@@ -132,6 +140,8 @@ public function getAllWhere(array $where): array
     $queryPrepared->execute($where);
     return $queryPrepared->fetchAll();
 }
+
+
 
 
 

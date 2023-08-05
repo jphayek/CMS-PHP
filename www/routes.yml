@@ -14,7 +14,7 @@ contact:
   controller: Main
   action: contact
 
-sitemap.xml:
+sitemap:
   controller: SitemapController
   action: generate 
 

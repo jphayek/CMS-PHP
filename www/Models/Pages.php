@@ -15,6 +15,10 @@ class Pages extends SQL{
     protected ?int $created_by;
     protected ?String $slug;
     protected ?int $status;
+    protected ?int $url;
+    protected ?int $lastmod;
+    protected ?int $changefreq;
+    protected ?int $priority;
 
     public function __construct(){
         parent::__construct();
@@ -178,6 +182,34 @@ class Pages extends SQL{
         $this->setStatus($memento->getState());
     }
     
+
+    public function generateUrl($page)
+    {
+        $baseUrl = 'https://localhost'; // Remplacez par l'URL de base de votre site
+        $slug = $page['slug']; // Supposons que le slug soit stocké dans la colonne 'slug'
+        $category = $page['category']; // Supposons que la catégorie soit stockée dans la colonne 'category'
+
+        // Générer l'URL complète en fonction du slug et de la catégorie
+        // Par exemple, si la catégorie est "articles" et le slug est "mon-article", l'URL serait : https://www.example.com/articles/mon-article
+        $fullUrl = $baseUrl . '/' . $category . '/' . $slug;
+
+        return $fullUrl;
+    }
+
+    public function generateLastmod($page)
+    {
+        return date('Y-m-d', strtotime($page['updated_at']));
+    }
+
+    public function generateChangefreq($page)
+    {
+        return 'weekly';
+    }
+
+    public function generatePriority($page)
+    {
+        return '0.5';
+    }
 
 
 }
