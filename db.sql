@@ -20,9 +20,9 @@ CREATE TABLE "public"."esgi_user" (
 ) WITH (oids = false);
 
 INSERT INTO "esgi_user" ("id", "firstname", "lastname", "email", "pwd", "country", "status", "date_inserted", "date_updated", "role", "verificationtoken") VALUES
-(1,	'Lisa',	'GUEMMAR',	'wp-admin@gmail.com',	'$2y$10$YyqpzxZIYJOXvD3qUbosKe0CG83z5mGcHyqUx3Zg0ZwnYsbO4nM7C',	NULL,	1,	NULL,	NULL,	'user',	'51c9d65a8d6f64499c14aee07d928f84eccd49971d5ab48441538e86a64ab1a9538f05d6ff0288967d9498263d4e714a61fd'),
-(2,	'Blandine',	'BA',	'ba@gmail.com',	'$2y$10$dhFfy09yL8uOvrQSePGoR.YJz7xPKoQJJ9.ftNCMSPC3/V7Cz3/4O',	NULL,	1,	NULL,	NULL,	'user',	'f1ec7c31cce1a43378d455c727aabf5793215604cc7b1a2091fe794c60a165b381ad0ff15e344b13a78c8d43c1c1e320c154');
-
+(1,	'Jean-paul',	'HAYEK',	'jphayek@user.com',	'$2y$10$jDveAzEtjzitGlyEj/d0gu8FlGnFwQrM9f2SyAWsEhXhwb/uZN56W',	NULL,	0,	NULL,	NULL,	'user',	'fcb68109d992fa156e377006aa3931cd9fd54b6b53d61db8d5538b0a6294cbe9934ab50fe0577b4fd0e193a0f47209a855e7'),
+(2,	'Test',	'USER',	'test@user.com',	'$2y$10$RFkilW6oFze3u9eNY7RLxeCYxm4/biazvyrucs0u9czPAC7HnxlRS',	NULL,	1,	NULL,	NULL,	'user',	'c09a4ed9d53ca2291839fa1776e12d31ba6e617c554b8cee74016469f4b0c826d4a3d0a616ee451212d1c5a2160980f51731'),
+(3,	'Jean-paul',	'HAYEK',	'jphayek@myges.fr',	'$2y$10$9w16xcdZftf0ccGQR1s6aOvHM8Dke0oKFwqKBTW.xOb9JNnIeYYrm',	NULL,	0,	NULL,	NULL,	'admin',	'8d9de25d4a7627d69bbb644ff97649da58422d0520cb1210546a26faef191dc8410eb4444f25d5a73354c04410f53efb443d');
 -- 2023-06-28 09:53:25.240648+00
 
 
