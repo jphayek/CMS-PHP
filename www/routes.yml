@@ -14,7 +14,9 @@ contact:
   controller: Main
   action: contact
 
- 
+sitemap.xml:
+  controller: SitemapController
+  action: generate 
 
 login:
   controller: Auth
