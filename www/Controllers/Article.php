@@ -47,8 +47,6 @@ class Article{
             $article->setContent($_POST['content']);
           
             $article->setAuthor($_SESSION['user_id']);
-            //var_dump($_SESSION);
-            //$article->setFirstname($_SESSION['firstname']);
             $article->save();
 
 
@@ -67,7 +65,6 @@ class Article{
     
         $articleModel = new ArticleModel();
         $article = $articleModel->getOneWhere(["id"=> $id ]);  // Obtient l'utilisateur par son ID
-        //var_dump($article);
         if (!$article) {
             throw new \Exception('Article not found');
         }
