@@ -1,4 +1,4 @@
-<h2>Welcome to esgi Cours</h2>
+<h3>Voici les Articles les plus recent :</h3>
 
 <?php foreach ($articles as $article): ?>
     <article class="article">

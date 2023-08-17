@@ -9,7 +9,7 @@
     
 </head>
 <body>
-    <div role="navigation" class="navbar navbar-default navbar-static-top" style="background-color: lightblue;">
+    <div role="navigation" class="navbar navbar-default navbar-static-top" style="background-color: lightgreen;">
       <div class="container">
         <div class="navbar-header">
           <button data-target=".navbar-collapse" data-toggle="collapse" class="navbar-toggle" type="button">
@@ -18,7 +18,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a href="/" class="navbar-brand" style="color: black; font-size:25px;">Mes Cours</a>
+          <a href="/" class="navbar-brand" style="color: black; font-size:20px;">ESGI</a>
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
