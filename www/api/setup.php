@@ -1,9 +1,9 @@
 <?php
-// Remplacez ces informations par les détails de votre base de données
+
 $host = 'localhost';
-$dbname = 'nom_de_la_base_de_donnees';
-$username = 'nom_d_utilisateur';
-$password = 'mot_de_passe';
+$dbname = 'pa-iw';
+$username = 'pa-iw';
+$password = 'Response11';
 
 try {
     $dbh = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
@@ -18,11 +18,11 @@ try {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Récupérer les données du formulaire
-    $databaseName = $_POST['databaseName'];
-    $databaseUsername = $_POST['databaseUsername'];
-    $databasePassword = $_POST['databasePassword'];
+    $databaseName = $_POST['pa-iw'];
+    $databaseUsername = $_POST['pa-iw'];
+    $databasePassword = $_POST['Response11'];
 
-    // Créer une table dans la base de données (exemple très simple)
+   
     $query = "CREATE TABLE esgi_user (
                 id INT PRIMARY KEY AUTO_INCREMENT,
                 username VARCHAR(255) NOT NULL,
