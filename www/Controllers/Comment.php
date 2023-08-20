@@ -93,7 +93,6 @@ class Comment
     }
     
     // Vérifiez si l'utilisateur est connecté et s'il est un administrateur
-    // Ajoutez ici le code de vérification de l'administrateur, cela dépend de la façon dont vous gérez les utilisateurs et les rôles
 
     // Vérifiez si l'ID du commentaire est fourni
     if (!isset($_GET['id'])) {
@@ -101,14 +100,13 @@ class Comment
         return;
     }
 
-    // Récupérez l'ID du commentaire
+    // l'ID du commentaire
     $commentId = $_GET['id'];
 
-    // Récupérez le commentaire de la base de données
+    
     $commentModel = new CommentModel();
     $comment = $commentModel->getOneWhere(["id" => $commentId]);
 
-    // Vérifiez si le commentaire existe
     if (!$comment) {
         echo "Le commentaire n'existe pas!";
         return;
@@ -131,10 +129,8 @@ public function delete()
         header('Location: /login');
         exit();
     }
-    // Vérifiez si l'utilisateur est connecté et s'il est un administrateur
-    // Ajoutez ici le code de vérification de l'administrateur, cela dépend de la façon dont vous gérez les utilisateurs et les rôles
 
-    // Vérifiez si l'ID du commentaire est fourni
+    //ID du commentaire est fourni
     if (!isset($_GET['id'])) {
         echo "ID du commentaire non fourni!";
         return;
@@ -153,10 +149,8 @@ public function delete()
         return;
     }
 
-    // Supprimez le commentaire
     $comment->delete();
 
-    // Redirigez l'utilisateur vers la page précédente ou vers la page d'administration des commentaires
     header('Location: /comments');
     exit;
 }
