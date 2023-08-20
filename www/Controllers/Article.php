@@ -71,8 +71,8 @@ class Article{
     
         $form = new UpdateArticleForm();
     
-        $view = new View("Article/update", "back"); // Déplacez cette ligne ici
-        $view->assign("form", $form->getConfig($article)); // Modifiez cette ligne pour passer $article
+        $view = new View("Article/update", "back");
+        $view->assign("form", $form->getConfig($article)); 
         $view->assign("formErrors", $form->errors);
     
         if($form->isSubmitted() && $form->isValid()){
@@ -107,10 +107,7 @@ class Article{
     header('Location: /articles');
 }
 
-//read on article
-// ...
 
-//read one article
 public function show($params)
 {
     $id = $params['id'];
@@ -131,8 +128,6 @@ public function show($params)
     $view->assign("article", $article);
     $view->render();
 }
-
-// ...
 
 
 
