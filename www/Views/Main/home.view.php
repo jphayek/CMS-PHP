@@ -2,10 +2,10 @@
 
 <?php foreach ($articles as $article): ?>
     <article class="article">
-        <h3><?= $article->getTitle(); ?></h3>
-        <p><?= $article->getContent(); ?></p>
-        <p>Author: <?= $article->getAuthor(); ?></p>
-        <p>Created at: <?= $article->getCreated_at(); ?></p>
+        <h3 style="color:green"><?= $article->getTitle(); ?></h3>
+        <p style="color:black"><?= $article->getContent(); ?></p>
+        <p style="color:black">Author: <?= $article->getAuthor(); ?></p>
+        <p style="color:black">Created at: <?= $article->getCreated_at(); ?></p>
         
         <a href="/article/show/?id=<?= $article->getId(); ?>" class="read-more-btn">Voir plus</a>
 
