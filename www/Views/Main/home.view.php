@@ -2,10 +2,10 @@
 
 <?php foreach ($articles as $article): ?>
     <article class="article">
-        <h3><?= $article->getTitle(); ?></h3>
-        <p><?= $article->getContent(); ?></p>
-        <p>Author: <?= $article->getAuthor(); ?></p>
-        <p>Created at: <?= $article->getCreated_at(); ?></p>
+        <h3 style="color:green"><?= $article->getTitle(); ?></h3>
+        <p style="color:black"><?= $article->getContent(); ?></p>
+        <p style="color:black">Author: <?= $article->getAuthor(); ?></p>
+        <p style="color:black">Created at: <?= $article->getCreated_at(); ?></p>
         
         <a href="/article/show/?id=<?= $article->getId(); ?>" class="read-more-btn">Voir plus</a>
 
@@ -22,9 +22,9 @@
         <span class="sr-only">Previous</span>
       </a>
     </li>
-    <li class="page-item"><a class="page-link" href="#">1</a></li>
-    <li class="page-item"><a class="page-link" href="#">2</a></li>
-    <li class="page-item"><a class="page-link" href="#">3</a></li>
+    <li class="page-item"><a class="page-link" href="/article/show/?id=<?= $article->getId(); ?>">1</a></li>
+    <li class="page-item"><a class="page-link" href="/article/show/?id=<?= $article->getId(); ?>">2</a></li>
+    <li class="page-item"><a class="page-link" href="/article/show/?id=<?= $article->getId(); ?>">3</a></li>
     <li class="page-item">
       <a class="page-link" href="#" aria-label="Next">
         <span aria-hidden="true">&raquo;</span>
@@ -35,6 +35,6 @@
 </nav>
 
 <div class="comment-bar">
-  <h3>comment</h3>
+  <h3>Comments:</h3>
   <!-- Ajoutez ici la structure HTML pour la barre de commentaires -->
 </div>
