@@ -66,8 +66,10 @@ article/delete:
     controller: Article
     action: delete
 
-
-
+articles/category:
+  path: /articles/category/{id}
+  controller: Article
+  action: readByCategory
 pages:
     controller: Pages
     action: read
