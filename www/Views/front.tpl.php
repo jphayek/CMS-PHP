@@ -50,7 +50,17 @@
     </div>
     <!-- inclure la vue -->
     <div class="container">
+      <!-- Affichage de la liste des catégories -->
+      <label for="category">Filtrer par catégorie :</label>
+      <select id="category">
+          <option value="0">Toutes les catégories</option>
+          <?php foreach ($categories as $category): ?>
+              <option value="<?php echo $category['id']; ?>"><?php echo $category['name']; ?></option>
+          <?php endforeach; ?>
+      </select>
+
       <?php include $this->view;?>
+
     </div>
      
     <div class="container" style="min-height:500px;">
@@ -59,6 +69,6 @@
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-
+            
 </body>
 </html>

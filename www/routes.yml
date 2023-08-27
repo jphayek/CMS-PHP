@@ -70,6 +70,13 @@ articles/category:
   path: /articles/category/{id}
   controller: Article
   action: readByCategory
+
+ajax_filter_articles:
+    path: /ajax/filter-articles
+    controller: Article
+    action: filterArticlesByCategory
+
+
 pages:
     controller: Pages
     action: read

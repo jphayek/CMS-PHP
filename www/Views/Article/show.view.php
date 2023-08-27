@@ -1,6 +1,6 @@
 <div class="container py-5">
     <div class="text-center mb-5">
-        <h1 class="display-4">Apprendre plus sur </h1>
+        <h1 class="display-4">Les Articles </h1>
     </div>
 
     <div class="row justify-content-center">

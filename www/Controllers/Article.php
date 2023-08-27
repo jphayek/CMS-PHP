@@ -135,22 +135,38 @@ public function readByCategory($params)
 {
     // Récupérez l'ID de la catégorie à partir des paramètres de l'URL
     $categoryId = $params['id'];
-/*
-    if (!isset($params['id'])) {
-        throw new \Exception('Article ID not provided');
-    }
-*/
+ 
     // Récupérez tous les articles de la catégorie depuis la base de données
     $articleModel = ArticleModel::getInstance();
-    //var_dump($articleModel);
-    $articlesByCategory = $articleModel->getOneWhere(["id" => $categoryId]);
-
+    
+    //$articlesByCategory = $articleModel->getOneWhere(["id" => $categoryId]);
+    $articlesByCategory = $articleModel->getArticlesByCategory($categoryId);
+    
     // Affichez les articles dans une vue appropriée
     $table = new articleTable($articlesByCategory);
 
-    $view = new View('Article/read', 'back');
+    //$view = new View('Article/read', 'back');
+    $view = new View('Article/read', 'front');
     $view->assign('table', $table->getConfig($articlesByCategory));
 }
+
+public function filterArticlesByCategory()
+    {
+        // Récupérez la catégorie sélectionnée depuis la requête AJAX (utilisez $_POST ou $_GET en fonction de la méthode d'envoi)
+        $categoryId = $_GET['category_id']; // Assurez-vous que cette valeur est valide et sécurisée
+        
+        // Exécutez la requête SQL pour récupérer les articles filtrés par la catégorie
+        $filteredArticles = $this->articleModel->getArticlesByCategory($categoryId); // Utilisez votre modèle d'article
+
+        // Vous pouvez renvoyer les articles au format JSON
+        header('Content-Type: application/json');
+        echo json_encode($filteredArticles);
+
+        // Ou vous pouvez renvoyer les articles au format HTML
+        // Générez le contenu HTML des articles filtrés
+        // ...
+        // echo $htmlContent;
+    }
 
 }
     

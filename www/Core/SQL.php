@@ -106,6 +106,26 @@ public function getAllArticle()
     return $queryPrepared->fetchAll();
 }
 
+public function getArticlesByCategory($categoryId)
+{
+    $sql = "SELECT a.*, u.firstname
+            FROM esgi_article AS a
+            INNER JOIN article_category AS ac ON a.id = ac.article_id
+            LEFT JOIN esgi_user AS u ON a.author = u.id
+            WHERE ac.category_id = :categoryId";
+    
+    $queryPrepared = $this->pdo->prepare($sql);
+
+    $queryPrepared->bindParam(':categoryId', $categoryId, \PDO::PARAM_INT);
+
+    $queryPrepared->execute();
+
+    $queryPrepared->setFetchMode(\PDO::FETCH_CLASS, get_called_class());
+    
+    return $queryPrepared->fetchAll();
+}
+
+
 public function Count(){
     $queryPrepared = $this->pdo->prepare("SELECT COUNT(*) FROM ".$this->table);
     $queryPrepared->execute();

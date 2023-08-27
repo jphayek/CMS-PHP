@@ -108,3 +108,13 @@ CREATE TABLE "public"."esgi_pages" (
 
 
 ALTER TABLE ONLY "public"."esgi_pages" ADD CONSTRAINT "fk_page_created_by" FOREIGN KEY (created_by) REFERENCES esgi_user(id) ON DELETE CASCADE NOT DEFERRABLE;
+
+CREATE TABLE "public"."categories" (
+    "id" serial PRIMARY KEY,
+    "name" character varying(255) NOT NULL
+);
+CREATE TABLE article_category (
+    article_id integer REFERENCES esgi_article(id),
+    category_id integer REFERENCES categories(id),
+    PRIMARY KEY (article_id, category_id)
+);
