@@ -39,11 +39,15 @@
           </ul>  
 
           <ul class="nav navbar-nav navbar-right">
-                    
-                    <li><a href="/login">Login</a></li>
-                    <li><a href="/register">Register</a></li>
-                    <li><a href="/logout">Logout</a></li>
-          </ul>
+            <?php if (!isset($_SESSION['user_id'])) : ?>
+                <!-- Afficher les liens "Login" et "Register" uniquement si l'utilisateur n'est pas connecté -->
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">Register</a></li>
+            <?php else : ?>
+                <!-- Afficher le lien "Logout" si l'utilisateur est connecté -->
+                <li><a href="/logout">Logout</a></li>
+            <?php endif; ?>
+        </ul>
          
         </div><!--/.nav-collapse -->
       </div>
