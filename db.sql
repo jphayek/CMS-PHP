@@ -108,3 +108,31 @@ CREATE TABLE "public"."esgi_pages" (
 
 
 ALTER TABLE ONLY "public"."esgi_pages" ADD CONSTRAINT "fk_page_created_by" FOREIGN KEY (created_by) REFERENCES esgi_user(id) ON DELETE CASCADE NOT DEFERRABLE;
+
+CREATE TABLE "public"."categories" (
+    "id" serial PRIMARY KEY,
+    "name" character varying(255) NOT NULL
+);
+CREATE TABLE article_category (
+    article_id integer REFERENCES esgi_article(id),
+    category_id integer REFERENCES categories(id),
+    PRIMARY KEY (article_id, category_id)
+);
+
+-- Insérer la catégorie "Sport"
+INSERT INTO categories (name) VALUES ('Sport');
+
+-- Insérer la catégorie "Blog"
+INSERT INTO categories (name) VALUES ('Blog');
+
+-- Insérer la catégorie "Other"
+INSERT INTO categories (name) VALUES ('Other')
+
+-- Associer un article à la catégorie "Sport"
+INSERT INTO article_category (article_id, category_id) VALUES (1, (SELECT id FROM categories WHERE name = 'Sport'));
+
+-- Associer un article à la catégorie "Blog"
+INSERT INTO article_category (article_id, category_id) VALUES (2, (SELECT id FROM categories WHERE name = 'Blog'));
+
+-- Associer un article à la catégorie "Other"
+INSERT INTO article_category (article_id, category_id) VALUES (3, (SELECT id FROM categories WHERE name = 'Other'));

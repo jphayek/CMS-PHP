@@ -52,7 +52,8 @@
 
     <?php foreach ($config["inputs"] as $name=>$configInput): ?>
       <div class="form-group">
-        <input
+        <?php if ($configInput["type"] != "select"): ?>
+              <input
                 name="<?= $name ?>"
                 placeholder="<?= $configInput["placeholder"] ?? "" ?>"
                 class="<?= $configInput["class"] ?? "" ?>"
@@ -60,7 +61,24 @@
                 type="<?= $configInput["type"] ?? "text" ?>"
                 value="<?= $configInput["value"] ?? "" ?>"
                 <?php  if(isset($configInput["required"]) && $configInput["required"]==true) echo "required"; ?>
-        ><br><br>
+              />
+        <?php else : ?>
+
+              <select
+                name="<?= $name ?>"
+                placeholder="<?= $configInput["placeholder"] ?? "" ?>"
+                class="<?= $configInput["class"] ?? "" ?>"
+                id="<?= $configInput["id"] ?? "" ?>"
+                <?php  if(isset($configInput["required"]) && $configInput["required"]==true) echo "required"; ?>
+              >
+              <?php foreach ($configInput["options"] as $optionId=>$optionLabel): ?>
+                <option value="<?= $optionId ?>"><?= $optionLabel ?></option>
+              <?php endforeach;?>
+
+              </select>
+          <?php endif; ?>
+
+        <br><br>
       </div>
     <?php endforeach;?>
 

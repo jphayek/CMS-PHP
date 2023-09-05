@@ -36,23 +36,29 @@ class Article{
             header('Location: /login');
             exit();
         }
+        
         $form = new ArticleForm();
         $view = new View("Article/create", "back");
         $view->assign("form", $form->getConfig());
         $view->assign("formErrors", $form->errors);
     
-        if($form->isSubmitted() && $form->isValid()){
+        if ($form->isSubmitted() && $form->isValid()) {
             $article = new ArticleModel();
             $article->setTitle($_POST['title']);
             $article->setContent($_POST['content']);
-          
             $article->setAuthor($_SESSION['user_id']);
+            $article->setCategoryId($_POST['category_id']);
             $article->save();
 
+            // Récupérez l'ID de la catégorie sélectionnée depuis le formulaire
+            $categoryId = $_POST['category_id'];
+            //var_dump($_POST['category_id']);
+            $article->associateCategory($categoryId);
 
             header('Location: /articles');
         }
     }
+
 
     //update article
     public function update($params): void
@@ -129,7 +135,36 @@ public function show($params)
     $view->render();
 }
 
+//Filtrer les articles par category
 
+public function filterArticlesByCategory()
+{
+    if (isset($_GET['category_id'])) {
+        $categoryId = $_GET['category_id'];
+        //var_dump($categoryId); exit;
+        // Récupérez les articles de la catégorie spécifiée
+        $articleModel = ArticleModel::getInstance();
+        //var_dump($articleModel); exit;
+        $articles = $articleModel->getArticlesByCategory($categoryId);
+        //var_dump($articles); exit;
+        
+        
+        $htmlContent = '';
+        foreach ($articles as $article) {
+            $htmlContent .= '<div class="article">';
+            $htmlContent .= '<h2>' . $article["title"] . '</h2>';
+            $htmlContent .= '<p>' . $article["content"] . '</p>';
+            $htmlContent .= '</div>';
+        }
+
+        //JSON
+         //header('Content-Type: application/json');
+         //echo json_encode($articles);
+
+        // HTML
+        echo $htmlContent;
+    }
+}
 
 }
     

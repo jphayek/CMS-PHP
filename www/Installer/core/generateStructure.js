@@ -4,10 +4,10 @@
  * @return {HTMLElement}
  */
 export default function generateStructure(structure) {
-  // TODO: A améliorer
+ 
   if (typeof structure.type === "function")
     return generateStructure(structure.type(structure.attributes));
-  //
+
 
   const element = document.createElement(structure.type);
 
@@ -40,6 +40,5 @@ export default function generateStructure(structure) {
     }
   }
 
-  //structure.node = element;
   return element;
 }

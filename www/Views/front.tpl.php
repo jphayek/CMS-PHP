@@ -24,8 +24,6 @@
           <ul class="nav navbar-nav">
           
             <li class="active"><a href="/">Home</a></li>
-            <li class=""><a href="">About</a></li>
-            <li class=""><a href="">Contact</a></li>
             <?php if (isset($pages) && is_array($pages)) : ?>
             <?php foreach ($pages as $page) : ?>
               <li><a href="/pages/<?= $page->getSlug(); ?>"><?= $page->getTitle(); ?></a></li>
@@ -47,22 +45,67 @@
                 <!-- Afficher le lien "Logout" si l'utilisateur est connecté -->
                 <li><a href="/logout">Logout</a></li>
             <?php endif; ?>
-        </ul>
+          </ul>
          
         </div><!--/.nav-collapse -->
       </div>
     </div>
     <!-- inclure la vue -->
     <div class="container">
+      <!-- Affichage de la liste des catégories -->
+      
+      <label for="category_id">Category:</label>
+
+        <select id="category_id" class="form-select" required>
+          <option value="0">All Articles</option>
+          <option value="1">SPORT</option>
+          <option value="2">BLOG</option>
+          <option value="3">OTHER</option>
+        
+        </select>
+
+    <!-- Div ou tout autre élément où vous afficherez les articles filtrés -->
+    <div id="filteredArticles">
+        <!-- Le contenu des articles filtrés sera affiché ici -->
+
       <?php include $this->view;?>
+
     </div>
      
     <div class="container" style="min-height:500px;">
     <div class="insert-post-ads1" style="margin-top:20px;">
 </div>
 </div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        
+        var categoryFilter = $('#category_id');
+        var filteredArticles = $('#filteredArticles');
+    
+        categoryFilter.on('change', function () {
+            var selectedCategoryId = categoryFilter.val();
+            //alert(selectedCategoryId);
+            $.ajax({
+              method: 'GET',
+              url: '/getArticlesByCategory?category_id='+selectedCategoryId, // Remplacez 1 par l'ID de la catégorie souhaitée
+              success: function (data) {
+                  // Mettez à jour le contenu de l'élément avec les articles filtrés
+                  filteredArticles.html(data);
+              },
+              error: function () {
+                  // Gérez les erreurs en conséquence
+                  alert('Une erreur s\'est produite lors du filtrage des articles.');
+              }
+          });
+        });
+    });
+</script>
+
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-
+            
 </body>
 </html>
