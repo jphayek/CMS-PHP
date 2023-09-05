@@ -106,6 +106,8 @@ public function getAllArticle()
     return $queryPrepared->fetchAll();
 }
 
+
+/*
 public function getArticlesByCategory($categoryId)
 {
     $sql = "SELECT a.*, u.firstname
@@ -124,6 +126,73 @@ public function getArticlesByCategory($categoryId)
     
     return $queryPrepared->fetchAll();
 }
+
+*/
+
+public function associateCategory(&$category)
+{
+    
+    $articleId = $this->getId();
+
+    // Préparez la requête SQL
+    $sql = "INSERT INTO categories (article_id, category_id) VALUES (:articleId, :categoryId)";
+
+    // Préparez la requête SQL
+    $queryPrepared = $this->pdo->prepare($sql);
+
+    // Liez les paramètres
+    $queryPrepared->bindParam(':articleId', $articleId, \PDO::PARAM_INT);
+    $queryPrepared->bindParam(':categoryId', $categoryId, \PDO::PARAM_INT);
+
+    // Exécutez la requête
+    $queryPrepared->execute();
+}
+
+
+public function createArticle($title, $content, $categoryId)
+{
+    // Créez l'article
+    $query = "INSERT INTO esgi_article (title, content) VALUES (:title, :content)";
+    $queryPrepared = $this->pdo->prepare($query);
+    $queryPrepared->bindParam(':title', $title, \PDO::PARAM_STR);
+    $queryPrepared->bindParam(':content', $content, \PDO::PARAM_STR);
+    $queryPrepared->execute();
+
+    // Récupérez l'ID de l'article que vous venez de créer
+    $articleId = $this->pdo->lastInsertId();
+
+    // Maintenant, associez l'article à la catégorie
+    $query = "INSERT INTO article_category (article_id, category_id) VALUES (:articleId, :categoryId)";
+    $queryPrepared = $this->pdo->prepare($query);
+    $queryPrepared->bindParam(':articleId', $articleId, \PDO::PARAM_INT);
+    $queryPrepared->bindParam(':categoryId', $categoryId, \PDO::PARAM_INT);
+    $queryPrepared->execute();
+
+    // Le nouvel article est maintenant associé à la catégorie spécifiée.
+}
+
+public function getArticlesByCategory($categoryId)
+{
+    $sql = "SELECT a.*, u.firstname
+            FROM esgi_article a
+            LEFT JOIN esgi_user u ON a.author = u.id";
+
+    if (!empty($categoryId)) {
+        
+        $sql .= " WHERE category_id = :category_id";
+    }
+
+    $stmt = $this->pdo->prepare($sql);
+    
+    if (!empty($categoryId)) {
+        $stmt->bindParam(":category_id", $categoryId, \PDO::PARAM_INT);
+    }
+    $stmt->execute();
+
+    $articles = $stmt->fetchAll();
+    return $articles;
+}
+
 
 
 public function Count(){

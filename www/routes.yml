@@ -66,16 +66,10 @@ article/delete:
     controller: Article
     action: delete
 
-articles/category:
-  path: /articles/category/{id}
+getArticlesByCategory:
+  path: /getArticlesByCategory
   controller: Article
-  action: readByCategory
-
-ajax_filter_articles:
-    path: /ajax/filter-articles
-    controller: Article
-    action: filterArticlesByCategory
-
+  action: filterArticlesByCategory
 
 pages:
     controller: Pages

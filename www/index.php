@@ -23,6 +23,7 @@ spl_autoload_register(function ($class) {
 
 // Retrieve the current URL.
 $uri = $_SERVER["REQUEST_URI"];
+//var_dump($uri); exit;
 $uriExploded = explode("?", $uri);
 $uri = strtolower(trim($uriExploded[0], "/"));
 
@@ -41,8 +42,9 @@ $found = false;
 foreach($routes as $pattern => $route) {
     $pattern = str_replace("{slug}", "([^/]+)", $pattern);
     $pattern = "@^".$pattern."$@i";
-
+    
     if(preg_match($pattern, $uri, $matches)) {
+
         array_shift($matches);
         $_GET = array_merge($_GET, $matches);
         $found = $route;
@@ -51,6 +53,7 @@ foreach($routes as $pattern => $route) {
 }
 
 if($found) {
+    
     if(empty($found["controller"]) || empty($found["action"])){
         die("Cette route ne possède pas de controller ou d'action dans le fichier de routing");
     }

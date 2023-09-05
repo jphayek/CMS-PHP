@@ -118,3 +118,21 @@ CREATE TABLE article_category (
     category_id integer REFERENCES categories(id),
     PRIMARY KEY (article_id, category_id)
 );
+
+-- Insérer la catégorie "Sport"
+INSERT INTO categories (name) VALUES ('Sport');
+
+-- Insérer la catégorie "Blog"
+INSERT INTO categories (name) VALUES ('Blog');
+
+-- Insérer la catégorie "Other"
+INSERT INTO categories (name) VALUES ('Other')
+
+-- Associer un article à la catégorie "Sport"
+INSERT INTO article_category (article_id, category_id) VALUES (1, (SELECT id FROM categories WHERE name = 'Sport'));
+
+-- Associer un article à la catégorie "Blog"
+INSERT INTO article_category (article_id, category_id) VALUES (2, (SELECT id FROM categories WHERE name = 'Blog'));
+
+-- Associer un article à la catégorie "Other"
+INSERT INTO article_category (article_id, category_id) VALUES (3, (SELECT id FROM categories WHERE name = 'Other'));

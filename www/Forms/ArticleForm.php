@@ -2,7 +2,7 @@
 
 namespace App\Forms;
 use App\Core\Validator;
-
+use App\Models\Category;
 
 class ArticleForm extends Validator
 {
@@ -10,7 +10,7 @@ class ArticleForm extends Validator
     protected array $config = [];
 
     public function getConfig():array{
-            
+
             $this->config = [
                 "config" => [
                     "method" => $this->method,
@@ -38,10 +38,25 @@ class ArticleForm extends Validator
                         "error" => "Your content is incorrect",
                         "required" => true
                     ],
+                    "category_id" => [
+                        "id" => "article-form-category",
+                        "type" => "select",
+                        "options" => [
+                            1 => "SPORT",
+                            2 => "BLOG",
+                            3 => "OTHER",
+                        ],
+                        "class" => "form-select",
+                        "placeholder" => "Category",
+                        "error" => "Please select a category",
+                        "required" => true,
+                        
+                    ],
 
                 ]
             ];
     
             return $this->config;
     }
+
 }

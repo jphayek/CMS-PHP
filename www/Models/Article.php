@@ -12,6 +12,8 @@ class Article extends SQL{
     protected ?Int $author;   
     protected ?String $created_at;
     protected ?String $updated_at;
+    protected Int $category_id;
+
 
     public function __construct(){
         parent::__construct();
@@ -128,6 +130,22 @@ class Article extends SQL{
     public function setUpdated_at(string $updated_at): void
     {
         $this->updated_at = $updated_at;
+    }
+
+    /**
+     * @return Int
+     */
+    public function getCategoryId(): int
+    {
+        return $this->category_id;
+    }
+
+    /**
+     * @param Int $categoryId
+     */
+    public function setCategoryId(int $categoryId): void
+    {
+        $this->category_id = $categoryId;
     }
 
 }
