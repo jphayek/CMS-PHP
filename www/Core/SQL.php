@@ -10,15 +10,13 @@ abstract class SQL{
 
     public function __construct()
     {
-        //Connexion à la bdd
-        //SINGLETON à réaliser
+       
         try {
             $this->pdo = new \PDO("pgsql:host=database;dbname=pa-iw;port=5432", "pa-iw", "Response11");
         }catch(\Exception $e){
             die("Erreur SQL : ".$e->getMessage());
         }
 
-        //$this->table = static::class;
         $classExploded = explode("\\", get_called_class());
         $this->table = "esgi_".end($classExploded);
     }
@@ -107,44 +105,20 @@ public function getAllArticle()
 }
 
 
-/*
-public function getArticlesByCategory($categoryId)
-{
-    $sql = "SELECT a.*, u.firstname
-            FROM esgi_article AS a
-            INNER JOIN article_category AS ac ON a.id = ac.article_id
-            LEFT JOIN esgi_user AS u ON a.author = u.id
-            WHERE ac.category_id = :categoryId";
-    
-    $queryPrepared = $this->pdo->prepare($sql);
-
-    $queryPrepared->bindParam(':categoryId', $categoryId, \PDO::PARAM_INT);
-
-    $queryPrepared->execute();
-
-    $queryPrepared->setFetchMode(\PDO::FETCH_CLASS, get_called_class());
-    
-    return $queryPrepared->fetchAll();
-}
-
-*/
-
 public function associateCategory(&$category)
 {
     
     $articleId = $this->getId();
 
-    // Préparez la requête SQL
     $sql = "INSERT INTO categories (article_id, category_id) VALUES (:articleId, :categoryId)";
 
-    // Préparez la requête SQL
+
     $queryPrepared = $this->pdo->prepare($sql);
 
     // Liez les paramètres
     $queryPrepared->bindParam(':articleId', $articleId, \PDO::PARAM_INT);
     $queryPrepared->bindParam(':categoryId', $categoryId, \PDO::PARAM_INT);
 
-    // Exécutez la requête
     $queryPrepared->execute();
 }
 
@@ -158,17 +132,14 @@ public function createArticle($title, $content, $categoryId)
     $queryPrepared->bindParam(':content', $content, \PDO::PARAM_STR);
     $queryPrepared->execute();
 
-    // Récupérez l'ID de l'article que vous venez de créer
     $articleId = $this->pdo->lastInsertId();
 
-    // Maintenant, associez l'article à la catégorie
     $query = "INSERT INTO article_category (article_id, category_id) VALUES (:articleId, :categoryId)";
     $queryPrepared = $this->pdo->prepare($query);
     $queryPrepared->bindParam(':articleId', $articleId, \PDO::PARAM_INT);
     $queryPrepared->bindParam(':categoryId', $categoryId, \PDO::PARAM_INT);
     $queryPrepared->execute();
 
-    // Le nouvel article est maintenant associé à la catégorie spécifiée.
 }
 
 public function getArticlesByCategory($categoryId)
