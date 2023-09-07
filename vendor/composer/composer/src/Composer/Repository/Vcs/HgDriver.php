@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -14,7 +14,6 @@ namespace Composer\Repository\Vcs;
 
 use Composer\Config;
 use Composer\Cache;
-use Composer\Pcre\Preg;
 use Composer\Util\Hg as HgUtils;
 use Composer\Util\ProcessExecutor;
 use Composer\Util\Filesystem;
@@ -25,19 +24,16 @@ use Composer\IO\IOInterface;
  */
 class HgDriver extends VcsDriver
 {
-    /** @var array<int|string, string> Map of tag name to identifier */
     protected $tags;
-    /** @var array<int|string, string> Map of branch name to identifier */
     protected $branches;
-    /** @var string */
     protected $rootIdentifier;
-    /** @var string */
     protected $repoDir;
+    protected $infoCache = array();
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function initialize(): void
+    public function initialize()
     {
         if (Filesystem::isLocalPath($this->url)) {
             $this->repoDir = $this->url;
@@ -47,7 +43,7 @@ class HgDriver extends VcsDriver
             }
 
             $cacheDir = $this->config->get('cache-vcs-dir');
-            $this->repoDir = $cacheDir . '/' . Preg::replace('{[^a-z0-9]}i', '-', $this->url) . '/';
+            $this->repoDir = $cacheDir . '/' . preg_replace('{[^a-z0-9]}i', '-', $this->url) . '/';
 
             $fs = new Filesystem();
             $fs->ensureDirectoryExists($cacheDir);
@@ -71,7 +67,7 @@ class HgDriver extends VcsDriver
                 $fs->removeDirectory($this->repoDir);
 
                 $repoDir = $this->repoDir;
-                $command = static function ($url) use ($repoDir): string {
+                $command = function ($url) use ($repoDir) {
                     return sprintf('hg clone --noupdate -- %s %s', ProcessExecutor::escape($url), ProcessExecutor::escape($repoDir));
                 };
 
@@ -84,12 +80,12 @@ class HgDriver extends VcsDriver
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function getRootIdentifier(): string
+    public function getRootIdentifier()
     {
         if (null === $this->rootIdentifier) {
-            $this->process->execute('hg tip --template "{node}"', $output, $this->repoDir);
+            $this->process->execute(sprintf('hg tip --template "{node}"'), $output, $this->repoDir);
             $output = $this->process->splitLines($output);
             $this->rootIdentifier = $output[0];
         }
@@ -98,33 +94,33 @@ class HgDriver extends VcsDriver
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function getUrl(): string
+    public function getUrl()
     {
         return $this->url;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function getSource(string $identifier): array
+    public function getSource($identifier)
     {
-        return ['type' => 'hg', 'url' => $this->getUrl(), 'reference' => $identifier];
+        return array('type' => 'hg', 'url' => $this->getUrl(), 'reference' => $identifier);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function getDist(string $identifier): ?array
+    public function getDist($identifier)
     {
         return null;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
-    public function getFileContent(string $file, string $identifier): ?string
+    public function getFileContent($file, $identifier)
     {
         if (isset($identifier[0]) && $identifier[0] === '-') {
             throw new \RuntimeException('Invalid hg identifier detected. Identifier must not start with a -, given: ' . $identifier);
@@ -134,16 +130,16 @@ class HgDriver extends VcsDriver
         $this->process->execute($resource, $content, $this->repoDir);
 
         if (!trim($content)) {
-            return null;
+            return;
         }
 
         return $content;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
-    public function getChangeDate(string $identifier): ?\DateTimeImmutable
+    public function getChangeDate($identifier)
     {
         $this->process->execute(
             sprintf(
@@ -154,20 +150,20 @@ class HgDriver extends VcsDriver
             $this->repoDir
         );
 
-        return new \DateTimeImmutable(trim($output), new \DateTimeZone('UTC'));
+        return new \DateTime(trim($output), new \DateTimeZone('UTC'));
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function getTags(): array
+    public function getTags()
     {
         if (null === $this->tags) {
-            $tags = [];
+            $tags = array();
 
             $this->process->execute('hg tags', $output, $this->repoDir);
             foreach ($this->process->splitLines($output) as $tag) {
-                if ($tag && Preg::isMatchStrictGroups('(^([^\s]+)\s+\d+:(.*)$)', $tag, $match)) {
+                if ($tag && preg_match('(^([^\s]+)\s+\d+:(.*)$)', $tag, $match)) {
                     $tags[$match[1]] = $match[2];
                 }
             }
@@ -180,24 +176,24 @@ class HgDriver extends VcsDriver
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function getBranches(): array
+    public function getBranches()
     {
         if (null === $this->branches) {
-            $branches = [];
-            $bookmarks = [];
+            $branches = array();
+            $bookmarks = array();
 
             $this->process->execute('hg branches', $output, $this->repoDir);
             foreach ($this->process->splitLines($output) as $branch) {
-                if ($branch && Preg::isMatchStrictGroups('(^([^\s]+)\s+\d+:([a-f0-9]+))', $branch, $match) && $match[1][0] !== '-') {
+                if ($branch && preg_match('(^([^\s]+)\s+\d+:([a-f0-9]+))', $branch, $match) && $match[1][0] !== '-') {
                     $branches[$match[1]] = $match[2];
                 }
             }
 
             $this->process->execute('hg bookmarks', $output, $this->repoDir);
             foreach ($this->process->splitLines($output) as $branch) {
-                if ($branch && Preg::isMatchStrictGroups('(^(?:[\s*]*)([^\s]+)\s+\d+:(.*)$)', $branch, $match) && $match[1][0] !== '-') {
+                if ($branch && preg_match('(^(?:[\s*]*)([^\s]+)\s+\d+:(.*)$)', $branch, $match) && $match[1][0] !== '-') {
                     $bookmarks[$match[1]] = $match[2];
                 }
             }
@@ -210,11 +206,11 @@ class HgDriver extends VcsDriver
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public static function supports(IOInterface $io, Config $config, string $url, bool $deep = false): bool
+    public static function supports(IOInterface $io, Config $config, $url, $deep = false)
     {
-        if (Preg::isMatch('#(^(?:https?|ssh)://(?:[^@]+@)?bitbucket.org|https://(?:.*?)\.kilnhg.com)#i', $url)) {
+        if (preg_match('#(^(?:https?|ssh)://(?:[^@]+@)?bitbucket.org|https://(?:.*?)\.kilnhg.com)#i', $url)) {
             return true;
         }
 
@@ -236,8 +232,8 @@ class HgDriver extends VcsDriver
             return false;
         }
 
-        $process = new ProcessExecutor($io);
-        $exit = $process->execute(sprintf('hg identify -- %s', ProcessExecutor::escape($url)), $ignored);
+        $processExecutor = new ProcessExecutor($io);
+        $exit = $processExecutor->execute(sprintf('hg identify -- %s', ProcessExecutor::escape($url)), $ignored);
 
         return $exit === 0;
     }

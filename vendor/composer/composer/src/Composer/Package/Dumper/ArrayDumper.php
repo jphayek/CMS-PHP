@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -23,12 +23,9 @@ use Composer\Package\RootPackageInterface;
  */
 class ArrayDumper
 {
-    /**
-     * @return array<string, mixed>
-     */
-    public function dump(PackageInterface $package): array
+    public function dump(PackageInterface $package)
     {
-        $keys = [
+        $keys = array(
             'binaries' => 'bin',
             'type',
             'extra',
@@ -37,9 +34,9 @@ class ArrayDumper
             'devAutoload' => 'autoload-dev',
             'notificationUrl' => 'notification-url',
             'includePaths' => 'include-path',
-        ];
+        );
 
-        $data = [];
+        $data = array();
         $data['name'] = $package->getPrettyName();
         $data['version'] = $package->getPrettyVersion();
         $data['version_normalized'] = $package->getVersion();
@@ -73,6 +70,10 @@ class ArrayDumper
             }
         }
 
+        if ($package->getArchiveExcludes()) {
+            $data['archive']['exclude'] = $package->getArchiveExcludes();
+        }
+
         foreach (BasePackage::$supportedLinkTypes as $type => $opts) {
             if ($links = $package->{'get'.ucfirst($opts['method'])}()) {
                 foreach ($links as $link) {
@@ -87,25 +88,14 @@ class ArrayDumper
             $data['suggest'] = $packages;
         }
 
-        if ($package->getReleaseDate() instanceof \DateTimeInterface) {
+        if ($package->getReleaseDate()) {
             $data['time'] = $package->getReleaseDate()->format(DATE_RFC3339);
-        }
-
-        if ($package->isDefaultBranch()) {
-            $data['default-branch'] = true;
         }
 
         $data = $this->dumpValues($package, $keys, $data);
 
         if ($package instanceof CompletePackageInterface) {
-            if ($package->getArchiveName()) {
-                $data['archive']['name'] = $package->getArchiveName();
-            }
-            if ($package->getArchiveExcludes()) {
-                $data['archive']['exclude'] = $package->getArchiveExcludes();
-            }
-
-            $keys = [
+            $keys = array(
                 'scripts',
                 'license',
                 'authors',
@@ -115,11 +105,11 @@ class ArrayDumper
                 'repositories',
                 'support',
                 'funding',
-            ];
+            );
 
             $data = $this->dumpValues($package, $keys, $data);
 
-            if (isset($data['keywords']) && \is_array($data['keywords'])) {
+            if (isset($data['keywords']) && is_array($data['keywords'])) {
                 sort($data['keywords']);
             }
 
@@ -135,20 +125,14 @@ class ArrayDumper
             }
         }
 
-        if (\count($package->getTransportOptions()) > 0) {
+        if (count($package->getTransportOptions()) > 0) {
             $data['transport-options'] = $package->getTransportOptions();
         }
 
         return $data;
     }
 
-    /**
-     * @param array<int|string, string> $keys
-     * @param array<string, mixed>      $data
-     *
-     * @return array<string, mixed>
-     */
-    private function dumpValues(PackageInterface $package, array $keys, array $data): array
+    private function dumpValues(PackageInterface $package, array $keys, array $data)
     {
         foreach ($keys as $method => $key) {
             if (is_numeric($method)) {
@@ -156,9 +140,9 @@ class ArrayDumper
             }
 
             $getter = 'get'.ucfirst($method);
-            $value = $package->{$getter}();
+            $value = $package->$getter();
 
-            if (null !== $value && !(\is_array($value) && 0 === \count($value))) {
+            if (null !== $value && !(is_array($value) && 0 === count($value))) {
                 $data[$key] = $value;
             }
         }

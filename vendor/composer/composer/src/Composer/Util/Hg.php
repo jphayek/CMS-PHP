@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -14,16 +14,12 @@ namespace Composer\Util;
 
 use Composer\Config;
 use Composer\IO\IOInterface;
-use Composer\Pcre\Preg;
 
 /**
  * @author Jonas Renaudot <jonas.renaudot@gmail.com>
  */
 class Hg
 {
-    /** @var string|false|null */
-    private static $version = false;
-
     /**
      * @var \Composer\IO\IOInterface
      */
@@ -46,23 +42,23 @@ class Hg
         $this->process = $process;
     }
 
-    public function runCommand(callable $commandCallable, string $url, ?string $cwd): void
+    public function runCommand($commandCallable, $url, $cwd)
     {
         $this->config->prohibitUrlByConfig($url, $this->io);
 
         // Try as is
-        $command = $commandCallable($url);
+        $command = call_user_func($commandCallable, $url);
 
         if (0 === $this->process->execute($command, $ignoredOutput, $cwd)) {
             return;
         }
 
         // Try with the authentication information available
-        if (Preg::isMatch('{^(https?)://((.+)(?:\:(.+))?@)?([^/]+)(/.*)?}mi', $url, $match) && $this->io->hasAuthentication((string) $match[5])) {
-            $auth = $this->io->getAuthentication((string) $match[5]);
-            $authenticatedUrl = $match[1] . '://' . rawurlencode($auth['username']) . ':' . rawurlencode($auth['password']) . '@' . $match[5] . $match[6];
+        if (preg_match('{^(https?)://((.+)(?:\:(.+))?@)?([^/]+)(/.*)?}mi', $url, $match) && $this->io->hasAuthentication($match[5])) {
+            $auth = $this->io->getAuthentication($match[5]);
+            $authenticatedUrl = $match[1] . '://' . rawurlencode($auth['username']) . ':' . rawurlencode($auth['password']) . '@' . $match[5] . (!empty($match[6]) ? $match[6] : null);
 
-            $command = $commandCallable($authenticatedUrl);
+            $command = call_user_func($commandCallable, $authenticatedUrl);
 
             if (0 === $this->process->execute($command, $ignoredOutput, $cwd)) {
                 return;
@@ -76,34 +72,23 @@ class Hg
         $this->throwException('Failed to clone ' . $url . ', ' . "\n\n" . $error, $url);
     }
 
-    /**
-     * @param non-empty-string $message
-     *
-     * @return never
-     */
-    private function throwException($message, string $url): void
+    public static function sanitizeUrl($message)
     {
-        if (null === self::getVersion($this->process)) {
-            throw new \RuntimeException(Url::sanitize('Failed to clone ' . $url . ', hg was not found, check that it is installed and in your PATH env.' . "\n\n" . $this->process->getErrorOutput()));
-        }
+        return preg_replace_callback('{://(?P<user>[^@]+?):(?P<password>.+?)@}', function ($m) {
+            if (preg_match('{^[a-f0-9]{12,}$}', $m[1])) {
+                return '://***:***@';
+            }
 
-        throw new \RuntimeException(Url::sanitize($message));
+            return '://' . $m[1] . ':***@';
+        }, $message);
     }
 
-    /**
-     * Retrieves the current hg version.
-     *
-     * @return string|null The hg version number, if present.
-     */
-    public static function getVersion(ProcessExecutor $process): ?string
+    private function throwException($message, $url)
     {
-        if (false === self::$version) {
-            self::$version = null;
-            if (0 === $process->execute('hg --version', $output) && Preg::isMatch('/^.+? (\d+(?:\.\d+)+)(?:\+.*?)?\)?\r?\n/', $output, $matches)) {
-                self::$version = $matches[1];
-            }
+        if (0 !== $this->process->execute('hg --version', $ignoredOutput)) {
+            throw new \RuntimeException(self::sanitizeUrl('Failed to clone ' . $url . ', hg was not found, check that it is installed and in your PATH env.' . "\n\n" . $this->process->getErrorOutput()));
         }
 
-        return self::$version;
+        throw new \RuntimeException(self::sanitizeUrl($message));
     }
 }

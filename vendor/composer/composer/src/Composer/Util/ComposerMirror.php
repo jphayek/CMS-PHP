@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -12,8 +12,6 @@
 
 namespace Composer\Util;
 
-use Composer\Pcre\Preg;
-
 /**
  * Composer mirror utilities
  *
@@ -21,56 +19,38 @@ use Composer\Pcre\Preg;
  */
 class ComposerMirror
 {
-    /**
-     * @param non-empty-string $mirrorUrl
-     * @return non-empty-string
-     */
-    public static function processUrl(string $mirrorUrl, string $packageName, string $version, ?string $reference, ?string $type, ?string $prettyVersion = null): string
+    public static function processUrl($mirrorUrl, $packageName, $version, $reference, $type)
     {
         if ($reference) {
-            $reference = Preg::isMatch('{^([a-f0-9]*|%reference%)$}', $reference) ? $reference : md5($reference);
+            $reference = preg_match('{^([a-f0-9]*|%reference%)$}', $reference) ? $reference : md5($reference);
         }
         $version = strpos($version, '/') === false ? $version : md5($version);
 
-        $from = ['%package%', '%version%', '%reference%', '%type%'];
-        $to = [$packageName, $version, $reference, $type];
-        if (null !== $prettyVersion) {
-            $from[] = '%prettyVersion%';
-            $to[] = $prettyVersion;
-        }
-
-        $url = str_replace($from, $to, $mirrorUrl);
-        assert($url !== '');
-
-        return $url;
-    }
-
-    /**
-     * @param non-empty-string $mirrorUrl
-     * @return string
-     */
-    public static function processGitUrl(string $mirrorUrl, string $packageName, string $url, ?string $type): string
-    {
-        if (Preg::isMatch('#^(?:(?:https?|git)://github\.com/|git@github\.com:)([^/]+)/(.+?)(?:\.git)?$#', $url, $match)) {
-            $url = 'gh-'.$match[1].'/'.$match[2];
-        } elseif (Preg::isMatch('#^https://bitbucket\.org/([^/]+)/(.+?)(?:\.git)?/?$#', $url, $match)) {
-            $url = 'bb-'.$match[1].'/'.$match[2];
-        } else {
-            $url = Preg::replace('{[^a-z0-9_.-]}i', '-', trim($url, '/'));
-        }
-
         return str_replace(
-            ['%package%', '%normalizedUrl%', '%type%'],
-            [$packageName, $url, $type],
+            array('%package%', '%version%', '%reference%', '%type%'),
+            array($packageName, $version, $reference, $type),
             $mirrorUrl
         );
     }
 
-    /**
-     * @param non-empty-string $mirrorUrl
-     * @return string
-     */
-    public static function processHgUrl(string $mirrorUrl, string $packageName, string $url, string $type): string
+    public static function processGitUrl($mirrorUrl, $packageName, $url, $type)
+    {
+        if (preg_match('#^(?:(?:https?|git)://github\.com/|git@github\.com:)([^/]+)/(.+?)(?:\.git)?$#', $url, $match)) {
+            $url = 'gh-'.$match[1].'/'.$match[2];
+        } elseif (preg_match('#^https://bitbucket\.org/([^/]+)/(.+?)(?:\.git)?/?$#', $url, $match)) {
+            $url = 'bb-'.$match[1].'/'.$match[2];
+        } else {
+            $url = preg_replace('{[^a-z0-9_.-]}i', '-', trim($url, '/'));
+        }
+
+        return str_replace(
+            array('%package%', '%normalizedUrl%', '%type%'),
+            array($packageName, $url, $type),
+            $mirrorUrl
+        );
+    }
+
+    public static function processHgUrl($mirrorUrl, $packageName, $url, $type)
     {
         return self::processGitUrl($mirrorUrl, $packageName, $url, $type);
     }

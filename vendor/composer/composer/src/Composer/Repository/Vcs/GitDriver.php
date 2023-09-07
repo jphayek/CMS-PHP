@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -12,10 +12,8 @@
 
 namespace Composer\Repository\Vcs;
 
-use Composer\Pcre\Preg;
 use Composer\Util\ProcessExecutor;
 use Composer\Util\Filesystem;
-use Composer\Util\Url;
 use Composer\Util\Git as GitUtil;
 use Composer\IO\IOInterface;
 use Composer\Cache;
@@ -26,22 +24,20 @@ use Composer\Config;
  */
 class GitDriver extends VcsDriver
 {
-    /** @var array<int|string, string> Map of tag name (can be turned to an int by php if it is a numeric name) to identifier */
+    protected $cache;
     protected $tags;
-    /** @var array<int|string, string> Map of branch name (can be turned to an int by php if it is a numeric name) to identifier */
     protected $branches;
-    /** @var string */
     protected $rootIdentifier;
-    /** @var string */
     protected $repoDir;
+    protected $infoCache = array();
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function initialize(): void
+    public function initialize()
     {
         if (Filesystem::isLocalPath($this->url)) {
-            $this->url = Preg::replace('{[\\/]\.git/?$}', '', $this->url);
+            $this->url = preg_replace('{[\\/]\.git/?$}', '', $this->url);
             if (!is_dir($this->url)) {
                 throw new \RuntimeException('Failed to read package information from '.$this->url.' as the path does not exist');
             }
@@ -52,7 +48,7 @@ class GitDriver extends VcsDriver
                 throw new \RuntimeException('GitDriver requires a usable cache directory, and it looks like you set it to be disabled');
             }
 
-            $this->repoDir = $this->config->get('cache-vcs-dir') . '/' . Preg::replace('{[^a-z0-9.]}i', '-', $this->url) . '/';
+            $this->repoDir = $this->config->get('cache-vcs-dir') . '/' . preg_replace('{[^a-z0-9.]}i', '-', $this->url) . '/';
 
             GitUtil::cleanEnv();
 
@@ -63,15 +59,12 @@ class GitDriver extends VcsDriver
                 throw new \RuntimeException('Can not clone '.$this->url.' to access package information. The "'.dirname($this->repoDir).'" directory is not writable by the current user.');
             }
 
-            if (Preg::isMatch('{^ssh://[^@]+@[^:]+:[^0-9]+}', $this->url)) {
+            if (preg_match('{^ssh://[^@]+@[^:]+:[^0-9]+}', $this->url)) {
                 throw new \InvalidArgumentException('The source URL '.$this->url.' is invalid, ssh URLs should have a port number after ":".'."\n".'Use ssh://git@example.com:22/path or just git@example.com:path if you do not want to provide a password or custom port.');
             }
 
             $gitUtil = new GitUtil($this->io, $this->config, $this->process, $fs);
             if (!$gitUtil->syncMirror($this->url, $this->repoDir)) {
-                if (!is_dir($this->repoDir)) {
-                    throw new \RuntimeException('Failed to clone '.$this->url.' to read package information from it');
-                }
                 $this->io->writeError('<error>Failed to update '.$this->url.', package information from this repository may be outdated</error>');
             }
 
@@ -81,32 +74,23 @@ class GitDriver extends VcsDriver
         $this->getTags();
         $this->getBranches();
 
-        $this->cache = new Cache($this->io, $this->config->get('cache-repo-dir').'/'.Preg::replace('{[^a-z0-9.]}i', '-', Url::sanitize($cacheUrl)));
-        $this->cache->setReadOnly($this->config->get('cache-read-only'));
+        $this->cache = new Cache($this->io, $this->config->get('cache-repo-dir').'/'.preg_replace('{[^a-z0-9.]}i', '-', $cacheUrl));
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function getRootIdentifier(): string
+    public function getRootIdentifier()
     {
         if (null === $this->rootIdentifier) {
             $this->rootIdentifier = 'master';
 
-            $gitUtil = new GitUtil($this->io, $this->config, $this->process, new Filesystem());
-            if (!Filesystem::isLocalPath($this->url)) {
-                $defaultBranch = $gitUtil->getMirrorDefaultBranch($this->url, $this->repoDir, false);
-                if ($defaultBranch !== null) {
-                    return $this->rootIdentifier = $defaultBranch;
-                }
-            }
-
-            // select currently checked out branch as default branch
+            // select currently checked out branch if master is not available
             $this->process->execute('git branch --no-color', $output, $this->repoDir);
             $branches = $this->process->splitLines($output);
             if (!in_array('* master', $branches)) {
                 foreach ($branches as $branch) {
-                    if ($branch && Preg::isMatchStrictGroups('{^\* +(\S+)}', $branch, $match)) {
+                    if ($branch && preg_match('{^\* +(\S+)}', $branch, $match)) {
                         $this->rootIdentifier = $match[1];
                         break;
                     }
@@ -118,33 +102,33 @@ class GitDriver extends VcsDriver
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function getUrl(): string
+    public function getUrl()
     {
         return $this->url;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function getSource(string $identifier): array
+    public function getSource($identifier)
     {
-        return ['type' => 'git', 'url' => $this->getUrl(), 'reference' => $identifier];
+        return array('type' => 'git', 'url' => $this->getUrl(), 'reference' => $identifier);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function getDist(string $identifier): ?array
+    public function getDist($identifier)
     {
         return null;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
-    public function getFileContent(string $file, string $identifier): ?string
+    public function getFileContent($file, $identifier)
     {
         if (isset($identifier[0]) && $identifier[0] === '-') {
             throw new \RuntimeException('Invalid git identifier detected. Identifier must not start with a -, given: ' . $identifier);
@@ -161,30 +145,30 @@ class GitDriver extends VcsDriver
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
-    public function getChangeDate(string $identifier): ?\DateTimeImmutable
+    public function getChangeDate($identifier)
     {
         $this->process->execute(sprintf(
             'git -c log.showSignature=false log -1 --format=%%at %s',
             ProcessExecutor::escape($identifier)
         ), $output, $this->repoDir);
 
-        return new \DateTimeImmutable('@'.trim($output), new \DateTimeZone('UTC'));
+        return new \DateTime('@'.trim($output), new \DateTimeZone('UTC'));
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function getTags(): array
+    public function getTags()
     {
         if (null === $this->tags) {
-            $this->tags = [];
+            $this->tags = array();
 
             $this->process->execute('git show-ref --tags --dereference', $output, $this->repoDir);
             foreach ($output = $this->process->splitLines($output) as $tag) {
-                if ($tag && Preg::isMatch('{^([a-f0-9]{40}) refs/tags/(\S+?)(\^\{\})?$}', $tag, $match)) {
-                    $this->tags[$match[2]] = (string) $match[1];
+                if ($tag && preg_match('{^([a-f0-9]{40}) refs/tags/(\S+?)(\^\{\})?$}', $tag, $match)) {
+                    $this->tags[$match[2]] = $match[1];
                 }
             }
         }
@@ -193,17 +177,17 @@ class GitDriver extends VcsDriver
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function getBranches(): array
+    public function getBranches()
     {
         if (null === $this->branches) {
-            $branches = [];
+            $branches = array();
 
             $this->process->execute('git branch --no-color --no-abbrev -v', $output, $this->repoDir);
             foreach ($this->process->splitLines($output) as $branch) {
-                if ($branch && !Preg::isMatch('{^ *[^/]+/HEAD }', $branch)) {
-                    if (Preg::isMatchStrictGroups('{^(?:\* )? *(\S+) *([a-f0-9]+)(?: .*)?$}', $branch, $match) && $match[1][0] !== '-') {
+                if ($branch && !preg_match('{^ *[^/]+/HEAD }', $branch)) {
+                    if (preg_match('{^(?:\* )? *(\S+) *([a-f0-9]+)(?: .*)?$}', $branch, $match) && $match[1][0] !== '-') {
                         $branches[$match[1]] = $match[2];
                     }
                 }
@@ -216,11 +200,11 @@ class GitDriver extends VcsDriver
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public static function supports(IOInterface $io, Config $config, string $url, bool $deep = false): bool
+    public static function supports(IOInterface $io, Config $config, $url, $deep = false)
     {
-        if (Preg::isMatch('#(^git://|\.git/?$|git(?:olite)?@|//git\.|//github.com/)#i', $url)) {
+        if (preg_match('#(^git://|\.git/?$|git(?:olite)?@|//git\.|//github.com/)#i', $url)) {
             return true;
         }
 
@@ -246,7 +230,7 @@ class GitDriver extends VcsDriver
         GitUtil::cleanEnv();
 
         try {
-            $gitUtil->runCommand(static function ($url): string {
+            $gitUtil->runCommand(function ($url) {
                 return 'git ls-remote --heads -- ' . ProcessExecutor::escape($url);
             }, $url, sys_get_temp_dir());
         } catch (\RuntimeException $e) {

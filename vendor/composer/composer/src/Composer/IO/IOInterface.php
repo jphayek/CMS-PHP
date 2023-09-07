@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -13,20 +13,19 @@
 namespace Composer\IO;
 
 use Composer\Config;
-use Psr\Log\LoggerInterface;
 
 /**
  * The Input/Output helper interface.
  *
  * @author François Pluchino <francois.pluchino@opendisplay.com>
  */
-interface IOInterface extends LoggerInterface
+interface IOInterface
 {
-    public const QUIET = 1;
-    public const NORMAL = 2;
-    public const VERBOSE = 4;
-    public const VERY_VERBOSE = 8;
-    public const DEBUG = 16;
+    const QUIET = 1;
+    const NORMAL = 2;
+    const VERBOSE = 4;
+    const VERY_VERBOSE = 8;
+    const DEBUG = 16;
 
     /**
      * Is this input means interactive?
@@ -66,81 +65,51 @@ interface IOInterface extends LoggerInterface
     /**
      * Writes a message to the output.
      *
-     * @param string|string[] $messages  The message as an array of lines or a single string
-     * @param bool            $newline   Whether to add a newline or not
-     * @param int             $verbosity Verbosity level from the VERBOSITY_* constants
-     *
-     * @return void
+     * @param string|array $messages  The message as an array of lines or a single string
+     * @param bool         $newline   Whether to add a newline or not
+     * @param int          $verbosity Verbosity level from the VERBOSITY_* constants
      */
-    public function write($messages, bool $newline = true, int $verbosity = self::NORMAL);
+    public function write($messages, $newline = true, $verbosity = self::NORMAL);
 
     /**
      * Writes a message to the error output.
      *
-     * @param string|string[] $messages  The message as an array of lines or a single string
-     * @param bool            $newline   Whether to add a newline or not
-     * @param int             $verbosity Verbosity level from the VERBOSITY_* constants
-     *
-     * @return void
+     * @param string|array $messages  The message as an array of lines or a single string
+     * @param bool         $newline   Whether to add a newline or not
+     * @param int          $verbosity Verbosity level from the VERBOSITY_* constants
      */
-    public function writeError($messages, bool $newline = true, int $verbosity = self::NORMAL);
-
-    /**
-     * Writes a message to the output, without formatting it.
-     *
-     * @param string|string[] $messages  The message as an array of lines or a single string
-     * @param bool            $newline   Whether to add a newline or not
-     * @param int             $verbosity Verbosity level from the VERBOSITY_* constants
-     *
-     * @return void
-     */
-    public function writeRaw($messages, bool $newline = true, int $verbosity = self::NORMAL);
-
-    /**
-     * Writes a message to the error output, without formatting it.
-     *
-     * @param string|string[] $messages  The message as an array of lines or a single string
-     * @param bool            $newline   Whether to add a newline or not
-     * @param int             $verbosity Verbosity level from the VERBOSITY_* constants
-     *
-     * @return void
-     */
-    public function writeErrorRaw($messages, bool $newline = true, int $verbosity = self::NORMAL);
+    public function writeError($messages, $newline = true, $verbosity = self::NORMAL);
 
     /**
      * Overwrites a previous message to the output.
      *
-     * @param string|string[] $messages  The message as an array of lines or a single string
-     * @param bool            $newline   Whether to add a newline or not
-     * @param int             $size      The size of line
-     * @param int             $verbosity Verbosity level from the VERBOSITY_* constants
-     *
-     * @return void
+     * @param string|array $messages  The message as an array of lines or a single string
+     * @param bool         $newline   Whether to add a newline or not
+     * @param int          $size      The size of line
+     * @param int          $verbosity Verbosity level from the VERBOSITY_* constants
      */
-    public function overwrite($messages, bool $newline = true, ?int $size = null, int $verbosity = self::NORMAL);
+    public function overwrite($messages, $newline = true, $size = null, $verbosity = self::NORMAL);
 
     /**
      * Overwrites a previous message to the error output.
      *
-     * @param string|string[] $messages  The message as an array of lines or a single string
-     * @param bool            $newline   Whether to add a newline or not
-     * @param int             $size      The size of line
-     * @param int             $verbosity Verbosity level from the VERBOSITY_* constants
-     *
-     * @return void
+     * @param string|array $messages  The message as an array of lines or a single string
+     * @param bool         $newline   Whether to add a newline or not
+     * @param int          $size      The size of line
+     * @param int          $verbosity Verbosity level from the VERBOSITY_* constants
      */
-    public function overwriteError($messages, bool $newline = true, ?int $size = null, int $verbosity = self::NORMAL);
+    public function overwriteError($messages, $newline = true, $size = null, $verbosity = self::NORMAL);
 
     /**
      * Asks a question to the user.
      *
      * @param string $question The question to ask
-     * @param string|bool|int|float|null $default  The default answer if none is given by the user
+     * @param string $default  The default answer if none is given by the user
      *
      * @throws \RuntimeException If there is no data to read in the input stream
-     * @return mixed       The user answer
+     * @return string            The user answer
      */
-    public function ask(string $question, $default = null);
+    public function ask($question, $default = null);
 
     /**
      * Asks a confirmation to the user.
@@ -152,7 +121,7 @@ interface IOInterface extends LoggerInterface
      *
      * @return bool true if the user has confirmed, false otherwise
      */
-    public function askConfirmation(string $question, bool $default = true);
+    public function askConfirmation($question, $default = true);
 
     /**
      * Asks for a value and validates the response.
@@ -169,38 +138,36 @@ interface IOInterface extends LoggerInterface
      * @throws \Exception When any of the validators return an error
      * @return mixed
      */
-    public function askAndValidate(string $question, callable $validator, ?int $attempts = null, $default = null);
+    public function askAndValidate($question, $validator, $attempts = null, $default = null);
 
     /**
      * Asks a question to the user and hide the answer.
      *
      * @param string $question The question to ask
      *
-     * @return string|null The answer
+     * @return string The answer
      */
-    public function askAndHideAnswer(string $question);
+    public function askAndHideAnswer($question);
 
     /**
      * Asks the user to select a value.
      *
      * @param string      $question     The question to ask
-     * @param string[]    $choices      List of choices to pick from
+     * @param array       $choices      List of choices to pick from
      * @param bool|string $default      The default answer if the user enters nothing
      * @param bool|int    $attempts     Max number of times to ask before giving up (false by default, which means infinite)
      * @param string      $errorMessage Message which will be shown if invalid value from choice list would be picked
      * @param bool        $multiselect  Select more than one value separated by comma
      *
      * @throws \InvalidArgumentException
-     *
-     * @return int|string|list<string>|bool     The selected value or values (the key of the choices array)
-     * @phpstan-return ($multiselect is true ? list<string> : string|int|bool)
+     * @return int|string|array          The selected value or values (the key of the choices array)
      */
-    public function select(string $question, array $choices, $default, $attempts = false, string $errorMessage = 'Value "%s" is invalid', bool $multiselect = false);
+    public function select($question, $choices, $default, $attempts = false, $errorMessage = 'Value "%s" is invalid', $multiselect = false);
 
     /**
      * Get all authentication information entered.
      *
-     * @return array<string, array{username: string|null, password: string|null}> The map of authentication data
+     * @return array The map of authentication data
      */
     public function getAuthentications();
 
@@ -211,32 +178,30 @@ interface IOInterface extends LoggerInterface
      *
      * @return bool
      */
-    public function hasAuthentication(string $repositoryName);
+    public function hasAuthentication($repositoryName);
 
     /**
      * Get the username and password of repository.
      *
      * @param string $repositoryName The unique name of repository
      *
-     * @return array{username: string|null, password: string|null}
+     * @return array The 'username' and 'password'
      */
-    public function getAuthentication(string $repositoryName);
+    public function getAuthentication($repositoryName);
 
     /**
      * Set the authentication information for the repository.
      *
-     * @param string      $repositoryName The unique name of repository
-     * @param string      $username       The username
-     * @param null|string $password       The password
-     *
-     * @return void
+     * @param string $repositoryName The unique name of repository
+     * @param string $username       The username
+     * @param string $password       The password
      */
-    public function setAuthentication(string $repositoryName, string $username, ?string $password = null);
+    public function setAuthentication($repositoryName, $username, $password = null);
 
     /**
      * Loads authentications from a config instance
      *
-     * @return void
+     * @param Config $config
      */
     public function loadConfiguration(Config $config);
 }

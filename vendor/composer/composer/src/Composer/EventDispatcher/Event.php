@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -25,12 +25,12 @@ class Event
     protected $name;
 
     /**
-     * @var string[] Arguments passed by the user, these will be forwarded to CLI script handlers
+     * @var array Arguments passed by the user, these will be forwarded to CLI script handlers
      */
     protected $args;
 
     /**
-     * @var mixed[] Flags usable in PHP script handlers
+     * @var array Flags usable in PHP script handlers
      */
     protected $flags;
 
@@ -42,11 +42,11 @@ class Event
     /**
      * Constructor.
      *
-     * @param string   $name  The event name
-     * @param string[] $args  Arguments passed by the user
-     * @param mixed[]  $flags Optional flags to pass data not as argument
+     * @param string $name  The event name
+     * @param array  $args  Arguments passed by the user
+     * @param array  $flags Optional flags to pass data not as argument
      */
-    public function __construct(string $name, array $args = [], array $flags = [])
+    public function __construct($name, array $args = array(), array $flags = array())
     {
         $this->name = $name;
         $this->args = $args;
@@ -58,7 +58,7 @@ class Event
      *
      * @return string The event name
      */
-    public function getName(): string
+    public function getName()
     {
         return $this->name;
     }
@@ -66,9 +66,9 @@ class Event
     /**
      * Returns the event's arguments.
      *
-     * @return string[] The event arguments
+     * @return array The event arguments
      */
-    public function getArguments(): array
+    public function getArguments()
     {
         return $this->args;
     }
@@ -76,9 +76,9 @@ class Event
     /**
      * Returns the event's flags.
      *
-     * @return mixed[] The event flags
+     * @return array The event flags
      */
-    public function getFlags(): array
+    public function getFlags()
     {
         return $this->flags;
     }
@@ -88,7 +88,7 @@ class Event
      *
      * @return bool Whether propagation has been stopped
      */
-    public function isPropagationStopped(): bool
+    public function isPropagationStopped()
     {
         return $this->propagationStopped;
     }
@@ -96,7 +96,7 @@ class Event
     /**
      * Prevents the event from being passed to further listeners
      */
-    public function stopPropagation(): void
+    public function stopPropagation()
     {
         $this->propagationStopped = true;
     }

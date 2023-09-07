@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of composer/xdebug-handler.
  *
@@ -15,77 +13,61 @@ namespace Composer\XdebugHandler;
 
 /**
  * @author John Stevenson <john-stevenson@blueyonder.co.uk>
- *
- * @phpstan-type restartData array{tmpIni: string, scannedInis: bool, scanDir: false|string, phprc: false|string, inis: string[], skipped: string}
  */
 class PhpConfig
 {
     /**
      * Use the original PHP configuration
      *
-     * @return string[] Empty array of PHP cli options
+     * @return array PHP cli options
      */
-    public function useOriginal(): array
+    public function useOriginal()
     {
         $this->getDataAndReset();
-        return [];
+        return array();
     }
 
     /**
      * Use standard restart settings
      *
-     * @return string[] PHP cli options
+     * @return array PHP cli options
      */
-    public function useStandard(): array
+    public function useStandard()
     {
-        $data = $this->getDataAndReset();
-        if ($data !== null) {
-            return ['-n', '-c', $data['tmpIni']];
+        if ($data = $this->getDataAndReset()) {
+            return array('-n', '-c', $data['tmpIni']);
         }
 
-        return [];
+        return array();
     }
 
     /**
      * Use environment variables to persist settings
      *
-     * @return string[] Empty array of PHP cli options
+     * @return array PHP cli options
      */
-    public function usePersistent(): array
+    public function usePersistent()
     {
-        $data = $this->getDataAndReset();
-        if ($data !== null) {
-            $this->updateEnv('PHPRC', $data['tmpIni']);
-            $this->updateEnv('PHP_INI_SCAN_DIR', '');
+        if ($data = $this->getDataAndReset()) {
+            Process::setEnv('PHPRC', $data['tmpIni']);
+            Process::setEnv('PHP_INI_SCAN_DIR', '');
         }
 
-        return [];
+        return array();
     }
 
     /**
      * Returns restart data if available and resets the environment
      *
-     * @phpstan-return restartData|null
+     * @return array|null
      */
-    private function getDataAndReset(): ?array
+    private function getDataAndReset()
     {
-        $data = XdebugHandler::getRestartSettings();
-        if ($data !== null) {
-            $this->updateEnv('PHPRC', $data['phprc']);
-            $this->updateEnv('PHP_INI_SCAN_DIR', $data['scanDir']);
+        if ($data = XdebugHandler::getRestartSettings()) {
+            Process::setEnv('PHPRC', $data['phprc']);
+            Process::setEnv('PHP_INI_SCAN_DIR', $data['scanDir']);
         }
 
         return $data;
-    }
-
-    /**
-     * Updates a restart settings value in the environment
-     *
-     * @param string $name
-     * @param string|false $value
-     */
-    private function updateEnv(string $name, $value): void
-    {
-        Process::setEnv($name, false !== $value ? $value : null);
     }
 }

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -12,34 +12,30 @@
 
 namespace Composer\Command;
 
-use Composer\Console\Input\InputOption;
 use Composer\Json\JsonFile;
-use Composer\Package\CompletePackageInterface;
 use Composer\Plugin\CommandEvent;
 use Composer\Plugin\PluginEvents;
-use Composer\Repository\RepositoryUtils;
-use Composer\Util\PackageInfo;
-use Composer\Util\PackageSorter;
-use Symfony\Component\Console\Formatter\OutputFormatter;
+use Composer\Package\PackageInterface;
+use Composer\Repository\RepositoryInterface;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * @author Benoît Merlet <benoit.merlet@gmail.com>
  */
 class LicensesCommand extends BaseCommand
 {
-    protected function configure(): void
+    protected function configure()
     {
         $this
             ->setName('licenses')
-            ->setDescription('Shows information about licenses of dependencies')
-            ->setDefinition([
-                new InputOption('format', 'f', InputOption::VALUE_REQUIRED, 'Format of the output: text, json or summary', 'text', ['text', 'json', 'summary']),
+            ->setDescription('Shows information about licenses of dependencies.')
+            ->setDefinition(array(
+                new InputOption('format', 'f', InputOption::VALUE_REQUIRED, 'Format of the output: text or json', 'text'),
                 new InputOption('no-dev', null, InputOption::VALUE_NONE, 'Disables search in require-dev packages.'),
-            ])
+            ))
             ->setHelp(
                 <<<EOT
 The license command displays detailed information about the licenses of
@@ -51,9 +47,9 @@ EOT
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $composer = $this->requireComposer();
+        $composer = $this->getComposer();
 
         $commandEvent = new CommandEvent(PluginEvents::COMMAND, 'licenses', $input, $output);
         $composer->getEventDispatcher()->dispatch($commandEvent->getName(), $commandEvent);
@@ -62,12 +58,12 @@ EOT
         $repo = $composer->getRepositoryManager()->getLocalRepository();
 
         if ($input->getOption('no-dev')) {
-            $packages = RepositoryUtils::filterRequiredPackages($repo->getPackages(), $root);
+            $packages = $this->filterRequiredPackages($repo, $root);
         } else {
-            $packages = $repo->getPackages();
+            $packages = $this->appendPackages($repo->getPackages(), array());
         }
 
-        $packages = PackageSorter::sortPackagesAlphabetically($packages);
+        ksort($packages);
         $io = $this->getIO();
 
         switch ($format = $input->getOption('format')) {
@@ -80,74 +76,90 @@ EOT
 
                 $table = new Table($output);
                 $table->setStyle('compact');
-                $table->setHeaders(['Name', 'Version', 'Licenses']);
+                $tableStyle = $table->getStyle();
+                if (method_exists($tableStyle, 'setVerticalBorderChars')) {
+                    $tableStyle->setVerticalBorderChars('');
+                } else {
+                    $tableStyle->setVerticalBorderChar('');
+                }
+                $tableStyle->setCellRowContentFormat('%s  ');
+                $table->setHeaders(array('Name', 'Version', 'License'));
                 foreach ($packages as $package) {
-                    $link = PackageInfo::getViewSourceOrHomepageUrl($package);
-                    if ($link !== null) {
-                        $name = '<href='.OutputFormatter::escape($link).'>'.$package->getPrettyName().'</>';
-                    } else {
-                        $name = $package->getPrettyName();
-                    }
-
-                    $table->addRow([
-                        $name,
+                    $table->addRow(array(
+                        $package->getPrettyName(),
                         $package->getFullPrettyVersion(),
-                        implode(', ', $package instanceof CompletePackageInterface ? $package->getLicense() : []) ?: 'none',
-                    ]);
+                        implode(', ', $package->getLicense()) ?: 'none',
+                    ));
                 }
                 $table->render();
                 break;
 
             case 'json':
-                $dependencies = [];
+                $dependencies = array();
                 foreach ($packages as $package) {
-                    $dependencies[$package->getPrettyName()] = [
+                    $dependencies[$package->getPrettyName()] = array(
                         'version' => $package->getFullPrettyVersion(),
-                        'license' => $package instanceof CompletePackageInterface ? $package->getLicense() : [],
-                    ];
+                        'license' => $package->getLicense(),
+                    );
                 }
 
-                $io->write(JsonFile::encode([
+                $io->write(JsonFile::encode(array(
                     'name' => $root->getPrettyName(),
                     'version' => $root->getFullPrettyVersion(),
                     'license' => $root->getLicense(),
                     'dependencies' => $dependencies,
-                ]));
+                )));
                 break;
 
-            case 'summary':
-                $usedLicenses = [];
-                foreach ($packages as $package) {
-                    $licenses = $package instanceof CompletePackageInterface ? $package->getLicense() : [];
-                    if (count($licenses) === 0) {
-                        $licenses[] = 'none';
-                    }
-                    foreach ($licenses as $licenseName) {
-                        if (!isset($usedLicenses[$licenseName])) {
-                            $usedLicenses[$licenseName] = 0;
-                        }
-                        $usedLicenses[$licenseName]++;
-                    }
-                }
-
-                // Sort licenses so that the most used license will appear first
-                arsort($usedLicenses, SORT_NUMERIC);
-
-                $rows = [];
-                foreach ($usedLicenses as $usedLicense => $numberOfDependencies) {
-                    $rows[] = [$usedLicense, $numberOfDependencies];
-                }
-
-                $symfonyIo = new SymfonyStyle($input, $output);
-                $symfonyIo->table(
-                    ['License', 'Number of dependencies'],
-                    $rows
-                );
-                break;
             default:
                 throw new \RuntimeException(sprintf('Unsupported format "%s".  See help for supported formats.', $format));
         }
 
         return 0;
+    }
+
+    /**
+     * Find package requires and child requires
+     *
+     * @param  RepositoryInterface $repo
+     * @param  PackageInterface    $package
+     * @param  array               $bucket
+     * @return array
+     */
+    private function filterRequiredPackages(RepositoryInterface $repo, PackageInterface $package, $bucket = array())
+    {
+        $requires = array_keys($package->getRequires());
+
+        $packageListNames = array_keys($bucket);
+        $packages = array_filter(
+            $repo->getPackages(),
+            function ($package) use ($requires, $packageListNames) {
+                return in_array($package->getName(), $requires) && !in_array($package->getName(), $packageListNames);
+            }
+        );
+
+        $bucket = $this->appendPackages($packages, $bucket);
+
+        foreach ($packages as $package) {
+            $bucket = $this->filterRequiredPackages($repo, $package, $bucket);
+        }
+
+        return $bucket;
+    }
+
+    /**
+     * Adds packages to the package list
+     *
+     * @param  array $packages the list of packages to add
+     * @param  array $bucket   the list to add packages to
+     * @return array
+     */
+    public function appendPackages(array $packages, array $bucket)
+    {
+        foreach ($packages as $package) {
+            $bucket[$package->getName()] = $package;
+        }
+
+        return $bucket;
     }
 }

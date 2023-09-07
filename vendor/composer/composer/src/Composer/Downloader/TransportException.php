@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -17,73 +17,37 @@ namespace Composer\Downloader;
  */
 class TransportException extends \RuntimeException
 {
-    /** @var ?array<string> */
     protected $headers;
-    /** @var ?string */
     protected $response;
-    /** @var ?int */
     protected $statusCode;
-    /** @var array<mixed> */
-    protected $responseInfo = [];
 
-    /**
-     * @param array<string> $headers
-     */
-    public function setHeaders(array $headers): void
+    public function setHeaders($headers)
     {
         $this->headers = $headers;
     }
 
-    /**
-     * @return ?array<string>
-     */
-    public function getHeaders(): ?array
+    public function getHeaders()
     {
         return $this->headers;
     }
 
-    public function setResponse(?string $response): void
+    public function setResponse($response)
     {
         $this->response = $response;
     }
 
-    /**
-     * @return ?string
-     */
-    public function getResponse(): ?string
+    public function getResponse()
     {
         return $this->response;
     }
 
-    /**
-     * @param ?int $statusCode
-     */
-    public function setStatusCode($statusCode): void
+    public function setStatusCode($statusCode)
     {
         $this->statusCode = $statusCode;
     }
 
-    /**
-     * @return ?int
-     */
-    public function getStatusCode(): ?int
+    public function getStatusCode()
     {
         return $this->statusCode;
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function getResponseInfo(): array
-    {
-        return $this->responseInfo;
-    }
-
-    /**
-     * @param array<mixed> $responseInfo
-     */
-    public function setResponseInfo(array $responseInfo): void
-    {
-        $this->responseInfo = $responseInfo;
     }
 }

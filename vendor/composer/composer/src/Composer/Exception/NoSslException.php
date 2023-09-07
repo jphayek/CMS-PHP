@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -13,8 +13,6 @@
 namespace Composer\Exception;
 
 /**
- * Specific exception for Composer\Util\HttpDownloader creation.
- *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
 class NoSslException extends \RuntimeException

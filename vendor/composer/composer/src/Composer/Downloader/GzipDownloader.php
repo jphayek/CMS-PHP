@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -12,10 +12,14 @@
 
 namespace Composer\Downloader;
 
-use React\Promise\PromiseInterface;
+use Composer\Config;
+use Composer\Cache;
+use Composer\EventDispatcher\EventDispatcher;
 use Composer\Package\PackageInterface;
 use Composer\Util\Platform;
 use Composer\Util\ProcessExecutor;
+use Composer\Util\RemoteFilesystem;
+use Composer\IO\IOInterface;
 
 /**
  * GZip archive downloader.
@@ -24,24 +28,31 @@ use Composer\Util\ProcessExecutor;
  */
 class GzipDownloader extends ArchiveDownloader
 {
-    protected function extract(PackageInterface $package, string $file, string $path): PromiseInterface
+    protected $process;
+
+    public function __construct(IOInterface $io, Config $config, EventDispatcher $eventDispatcher = null, Cache $cache = null, ProcessExecutor $process = null, RemoteFilesystem $rfs = null)
     {
-        $filename = pathinfo(parse_url(strtr((string) $package->getDistUrl(), '\\', '/'), PHP_URL_PATH), PATHINFO_FILENAME);
-        $targetFilepath = $path . DIRECTORY_SEPARATOR . $filename;
+        $this->process = $process ?: new ProcessExecutor($io);
+        parent::__construct($io, $config, $eventDispatcher, $cache, $rfs);
+    }
+
+    protected function extract($file, $path)
+    {
+        $targetFilepath = $path . DIRECTORY_SEPARATOR . basename(substr($file, 0, -3));
 
         // Try to use gunzip on *nix
         if (!Platform::isWindows()) {
             $command = 'gzip -cd -- ' . ProcessExecutor::escape($file) . ' > ' . ProcessExecutor::escape($targetFilepath);
 
             if (0 === $this->process->execute($command, $ignoredOutput)) {
-                return \React\Promise\resolve(null);
+                return;
             }
 
             if (extension_loaded('zlib')) {
                 // Fallback to using the PHP extension.
                 $this->extractUsingExt($file, $targetFilepath);
 
-                return \React\Promise\resolve(null);
+                return;
             }
 
             $processError = 'Failed to execute ' . $command . "\n\n" . $this->process->getErrorOutput();
@@ -50,11 +61,17 @@ class GzipDownloader extends ArchiveDownloader
 
         // Windows version of PHP has built-in support of gzip functions
         $this->extractUsingExt($file, $targetFilepath);
-
-        return \React\Promise\resolve(null);
     }
 
-    private function extractUsingExt(string $file, string $targetFilepath): void
+    /**
+     * {@inheritdoc}
+     */
+    protected function getFileName(PackageInterface $package, $path)
+    {
+        return $path.'/'.pathinfo(parse_url($package->getDistUrl(), PHP_URL_PATH), PATHINFO_BASENAME);
+    }
+
+    private function extractUsingExt($file, $targetFilepath)
     {
         $archiveFile = gzopen($file, 'rb');
         $targetFile = fopen($targetFilepath, 'wb');

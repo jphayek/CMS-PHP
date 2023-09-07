@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -21,13 +21,4 @@ namespace Composer\Repository;
  */
 interface InstalledRepositoryInterface extends WritableRepositoryInterface
 {
-    /**
-     * @return bool|null true if dev requirements were installed, false if --no-dev was used, null if yet unknown
-     */
-    public function getDevMode();
-
-    /**
-     * @return bool true if packages were never installed in this repository
-     */
-    public function isFresh();
 }

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -13,39 +13,55 @@
 namespace Composer\DependencyResolver\Operation;
 
 use Composer\Package\AliasPackage;
+use Composer\Package\PackageInterface;
 
 /**
  * Solver install operation.
  *
  * @author Nils Adermann <naderman@naderman.de>
  */
-class MarkAliasUninstalledOperation extends SolverOperation implements OperationInterface
+class MarkAliasUninstalledOperation extends SolverOperation
 {
-    protected const TYPE = 'markAliasUninstalled';
-
-    /**
-     * @var AliasPackage
-     */
     protected $package;
 
-    public function __construct(AliasPackage $package)
+    /**
+     * Initializes operation.
+     *
+     * @param AliasPackage $package package instance
+     * @param string       $reason  operation reason
+     */
+    public function __construct(AliasPackage $package, $reason = null)
     {
+        parent::__construct($reason);
+
         $this->package = $package;
     }
 
     /**
      * Returns package instance.
+     *
+     * @return PackageInterface
      */
-    public function getPackage(): AliasPackage
+    public function getPackage()
     {
         return $this->package;
     }
 
     /**
-     * @inheritDoc
+     * Returns job type.
+     *
+     * @return string
      */
-    public function show($lock): string
+    public function getJobType()
     {
-        return 'Marking <info>'.$this->package->getPrettyName().'</info> (<comment>'.$this->package->getFullPrettyVersion().'</comment>) as uninstalled, alias of <info>'.$this->package->getAliasOf()->getPrettyName().'</info> (<comment>'.$this->package->getAliasOf()->getFullPrettyVersion().'</comment>)';
+        return 'markAliasUninstalled';
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function __toString()
+    {
+        return 'Marking '.$this->package->getPrettyName().' ('.$this->formatVersion($this->package).') as uninstalled, alias of '.$this->package->getAliasOf()->getPrettyName().' ('.$this->formatVersion($this->package->getAliasOf()).')';
     }
 }

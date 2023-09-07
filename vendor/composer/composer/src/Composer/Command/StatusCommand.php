@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -13,7 +13,7 @@
 namespace Composer\Command;
 
 use Symfony\Component\Console\Input\InputInterface;
-use Composer\Console\Input\InputOption;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Composer\Downloader\ChangeReportInterface;
 use Composer\Downloader\DvcsDownloaderInterface;
@@ -32,21 +32,21 @@ use Composer\Util\ProcessExecutor;
  */
 class StatusCommand extends BaseCommand
 {
-    private const EXIT_CODE_ERRORS = 1;
-    private const EXIT_CODE_UNPUSHED_CHANGES = 2;
-    private const EXIT_CODE_VERSION_CHANGES = 4;
+    const EXIT_CODE_ERRORS = 1;
+    const EXIT_CODE_UNPUSHED_CHANGES = 2;
+    const EXIT_CODE_VERSION_CHANGES = 4;
 
     /**
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      */
-    protected function configure(): void
+    protected function configure()
     {
         $this
             ->setName('status')
-            ->setDescription('Shows a list of locally modified packages')
-            ->setDefinition([
+            ->setDescription('Shows a list of locally modified packages.')
+            ->setDefinition(array(
                 new InputOption('verbose', 'v|vv|vvv', InputOption::VALUE_NONE, 'Show modified files for each directory that contains changes.'),
-            ])
+            ))
             ->setHelp(
                 <<<EOT
 The status command displays a list of dependencies that have
@@ -58,9 +58,14 @@ EOT
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    /**
+     * @param  InputInterface  $input
+     * @param  OutputInterface $output
+     * @return int
+     */
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $composer = $this->requireComposer();
+        $composer = $this->getComposer();
 
         $commandEvent = new CommandEvent(PluginEvents::COMMAND, 'status', $input, $output);
         $composer->getEventDispatcher()->dispatch($commandEvent->getName(), $commandEvent);
@@ -68,7 +73,7 @@ EOT
         // Dispatch pre-status-command
         $composer->getEventDispatcher()->dispatchScript(ScriptEvents::PRE_STATUS_CMD, true);
 
-        $exitCode = $this->doExecute($input);
+        $exitCode = $this->doExecute($input, $output);
 
         // Dispatch post-status-command
         $composer->getEventDispatcher()->dispatchScript(ScriptEvents::POST_STATUS_CMD, true);
@@ -76,45 +81,47 @@ EOT
         return $exitCode;
     }
 
-    private function doExecute(InputInterface $input): int
+    /**
+     * @param  InputInterface  $input
+     * @param  OutputInterface $output
+     * @return int
+     */
+    private function doExecute(InputInterface $input, OutputInterface $output)
     {
         // init repos
-        $composer = $this->requireComposer();
+        $composer = $this->getComposer();
 
         $installedRepo = $composer->getRepositoryManager()->getLocalRepository();
 
         $dm = $composer->getDownloadManager();
         $im = $composer->getInstallationManager();
 
-        $errors = [];
+        $errors = array();
         $io = $this->getIO();
-        $unpushedChanges = [];
-        $vcsVersionChanges = [];
+        $unpushedChanges = array();
+        $vcsVersionChanges = array();
 
         $parser = new VersionParser;
-        $guesser = new VersionGuesser($composer->getConfig(), $composer->getLoop()->getProcessExecutor() ?? new ProcessExecutor($io), $parser);
+        $guesser = new VersionGuesser($composer->getConfig(), new ProcessExecutor($io), $parser);
         $dumper = new ArrayDumper;
 
         // list packages
         foreach ($installedRepo->getCanonicalPackages() as $package) {
-            $downloader = $dm->getDownloaderForPackage($package);
+            $downloader = $dm->getDownloaderForInstalledPackage($package);
             $targetDir = $im->getInstallPath($package);
-            if ($targetDir === null) {
-                continue;
-            }
 
             if ($downloader instanceof ChangeReportInterface) {
                 if (is_link($targetDir)) {
                     $errors[$targetDir] = $targetDir . ' is a symbolic link.';
                 }
 
-                if (null !== ($changes = $downloader->getLocalChanges($package, $targetDir))) {
+                if ($changes = $downloader->getLocalChanges($package, $targetDir)) {
                     $errors[$targetDir] = $changes;
                 }
             }
 
             if ($downloader instanceof VcsCapableDownloaderInterface) {
-                if ($downloader->getVcsReference($package, $targetDir)) {
+                if ($currentRef = $downloader->getVcsReference($package, $targetDir)) {
                     switch ($package->getInstallationSource()) {
                         case 'source':
                             $previousRef = $package->getSourceReference();
@@ -128,17 +135,17 @@ EOT
 
                     $currentVersion = $guesser->guessVersion($dumper->dump($package), $targetDir);
 
-                    if ($previousRef && $currentVersion && $currentVersion['commit'] !== $previousRef && $currentVersion['pretty_version'] !== $previousRef) {
-                        $vcsVersionChanges[$targetDir] = [
-                            'previous' => [
+                    if ($previousRef && $currentVersion && $currentVersion['commit'] !== $previousRef) {
+                        $vcsVersionChanges[$targetDir] = array(
+                            'previous' => array(
                                 'version' => $package->getPrettyVersion(),
                                 'ref' => $previousRef,
-                            ],
-                            'current' => [
+                            ),
+                            'current' => array(
                                 'version' => $currentVersion['pretty_version'],
                                 'ref' => $currentVersion['commit'],
-                            ],
-                        ];
+                            ),
+                        );
                     }
                 }
             }
@@ -162,7 +169,7 @@ EOT
 
             foreach ($errors as $path => $changes) {
                 if ($input->getOption('verbose')) {
-                    $indentedChanges = implode("\n", array_map(static function ($line): string {
+                    $indentedChanges = implode("\n", array_map(function ($line) {
                         return '    ' . ltrim($line);
                     }, explode("\n", $changes)));
                     $io->write('<info>'.$path.'</info>:');
@@ -178,7 +185,7 @@ EOT
 
             foreach ($unpushedChanges as $path => $changes) {
                 if ($input->getOption('verbose')) {
-                    $indentedChanges = implode("\n", array_map(static function ($line): string {
+                    $indentedChanges = implode("\n", array_map(function ($line) {
                         return '    ' . ltrim($line);
                     }, explode("\n", $changes)));
                     $io->write('<info>'.$path.'</info>:');

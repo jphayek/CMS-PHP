@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -15,27 +15,23 @@ namespace Composer\Repository\Vcs;
 use Composer\Config;
 use Composer\Cache;
 use Composer\IO\IOInterface;
-use Composer\Pcre\Preg;
 use Composer\Util\ProcessExecutor;
 use Composer\Util\Perforce;
-use Composer\Util\Http\Response;
 
 /**
  * @author Matt Whittom <Matt.Whittom@veteransunited.com>
  */
 class PerforceDriver extends VcsDriver
 {
-    /** @var string */
     protected $depot;
-    /** @var string */
     protected $branch;
-    /** @var ?Perforce */
-    protected $perforce = null;
+    /** @var Perforce */
+    protected $perforce;
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function initialize(): void
+    public function initialize()
     {
         $this->depot = $this->repoConfig['depot'];
         $this->branch = '';
@@ -49,12 +45,11 @@ class PerforceDriver extends VcsDriver
 
         $this->perforce->writeP4ClientSpec();
         $this->perforce->connectClient();
+
+        return true;
     }
 
-    /**
-     * @param array<string, mixed> $repoConfig
-     */
-    private function initPerforce(array $repoConfig): void
+    private function initPerforce($repoConfig)
     {
         if (!empty($this->perforce)) {
             return;
@@ -69,98 +64,101 @@ class PerforceDriver extends VcsDriver
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
-    public function getFileContent(string $file, string $identifier): ?string
+    public function getFileContent($file, $identifier)
     {
         return $this->perforce->getFileContent($file, $identifier);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
-    public function getChangeDate(string $identifier): ?\DateTimeImmutable
+    public function getChangeDate($identifier)
     {
         return null;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function getRootIdentifier(): string
+    public function getRootIdentifier()
     {
         return $this->branch;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function getBranches(): array
+    public function getBranches()
     {
         return $this->perforce->getBranches();
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function getTags(): array
+    public function getTags()
     {
         return $this->perforce->getTags();
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function getDist(string $identifier): ?array
+    public function getDist($identifier)
     {
         return null;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function getSource(string $identifier): array
+    public function getSource($identifier)
     {
-        return [
+        $source = array(
             'type' => 'perforce',
             'url' => $this->repoConfig['url'],
             'reference' => $identifier,
             'p4user' => $this->perforce->getUser(),
-        ];
+        );
+
+        return $source;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function getUrl(): string
+    public function getUrl()
     {
         return $this->url;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function hasComposerFile(string $identifier): bool
+    public function hasComposerFile($identifier)
     {
         $composerInfo = $this->perforce->getComposerInformation('//' . $this->depot . '/' . $identifier);
+        $composerInfoIdentifier = $identifier;
 
         return !empty($composerInfo);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function getContents(string $url): Response
+    public function getContents($url)
     {
-        throw new \BadMethodCallException('Not implemented/used in PerforceDriver');
+        return false;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public static function supports(IOInterface $io, Config $config, string $url, bool $deep = false): bool
+    public static function supports(IOInterface $io, Config $config, $url, $deep = false)
     {
-        if ($deep || Preg::isMatch('#\b(perforce|p4)\b#i', $url)) {
+        if ($deep || preg_match('#\b(perforce|p4)\b#i', $url)) {
             return Perforce::checkServerExists($url, new ProcessExecutor($io));
         }
 
@@ -168,20 +166,20 @@ class PerforceDriver extends VcsDriver
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function cleanup(): void
+    public function cleanup()
     {
         $this->perforce->cleanupClientSpec();
         $this->perforce = null;
     }
 
-    public function getDepot(): string
+    public function getDepot()
     {
         return $this->depot;
     }
 
-    public function getBranch(): string
+    public function getBranch()
     {
         return $this->branch;
     }

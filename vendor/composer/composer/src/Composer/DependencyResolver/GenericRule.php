@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -12,20 +12,25 @@
 
 namespace Composer\DependencyResolver;
 
+use Composer\Package\PackageInterface;
+use Composer\Package\Link;
+
 /**
  * @author Nils Adermann <naderman@naderman.de>
  */
 class GenericRule extends Rule
 {
-    /** @var list<int> */
     protected $literals;
 
     /**
-     * @param list<int> $literals
+     * @param array                 $literals
+     * @param int                   $reason     A RULE_* constant describing the reason for generating this rule
+     * @param Link|PackageInterface $reasonData
+     * @param array                 $job        The job this rule was created from
      */
-    public function __construct(array $literals, $reason, $reasonData)
+    public function __construct(array $literals, $reason, $reasonData, $job = null)
     {
-        parent::__construct($reason, $reasonData);
+        parent::__construct($reason, $reasonData, $job);
 
         // sort all packages ascending by id
         sort($literals);
@@ -33,17 +38,11 @@ class GenericRule extends Rule
         $this->literals = $literals;
     }
 
-    /**
-     * @return list<int>
-     */
-    public function getLiterals(): array
+    public function getLiterals()
     {
         return $this->literals;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getHash()
     {
         $data = unpack('ihash', md5(implode(',', $this->literals), true));
@@ -59,25 +58,27 @@ class GenericRule extends Rule
      * @param  Rule $rule The rule to check against
      * @return bool Whether the rules are equal
      */
-    public function equals(Rule $rule): bool
+    public function equals(Rule $rule)
     {
         return $this->literals === $rule->getLiterals();
     }
 
-    public function isAssertion(): bool
+    public function isAssertion()
     {
-        return 1 === \count($this->literals);
+        return 1 === count($this->literals);
     }
 
     /**
      * Formats a rule as a string of the format (Literal1|Literal2|...)
+     *
+     * @return string
      */
-    public function __toString(): string
+    public function __toString()
     {
         $result = $this->isDisabled() ? 'disabled(' : '(';
 
         foreach ($this->literals as $i => $literal) {
-            if ($i !== 0) {
+            if ($i != 0) {
                 $result .= '|';
             }
             $result .= $literal;

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -19,228 +19,200 @@ namespace Composer\Package;
  */
 class CompletePackage extends Package implements CompletePackageInterface
 {
-    /** @var mixed[] */
-    protected $repositories = [];
-    /** @var string[] */
-    protected $license = [];
-    /** @var string[] */
-    protected $keywords = [];
-    /** @var array<array{name?: string, homepage?: string, email?: string, role?: string}> */
-    protected $authors = [];
-    /** @var ?string */
-    protected $description = null;
-    /** @var ?string */
-    protected $homepage = null;
-    /** @var array<string, string[]> Map of script name to array of handlers */
-    protected $scripts = [];
-    /** @var array{issues?: string, forum?: string, wiki?: string, source?: string, email?: string, irc?: string, docs?: string, rss?: string, chat?: string, security?: string} */
-    protected $support = [];
-    /** @var array<array{url?: string, type?: string}> */
-    protected $funding = [];
-    /** @var bool|string */
+    protected $repositories;
+    protected $license = array();
+    protected $keywords;
+    protected $authors;
+    protected $description;
+    protected $homepage;
+    protected $scripts = array();
+    protected $support = array();
+    protected $funding = array();
     protected $abandoned = false;
-    /** @var ?string */
-    protected $archiveName = null;
-    /** @var string[] */
-    protected $archiveExcludes = [];
 
     /**
-     * @inheritDoc
+     * @param array $scripts
      */
-    public function setScripts(array $scripts): void
+    public function setScripts(array $scripts)
     {
         $this->scripts = $scripts;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function getScripts(): array
+    public function getScripts()
     {
         return $this->scripts;
     }
 
     /**
-     * @inheritDoc
+     * Set the repositories
+     *
+     * @param array $repositories
      */
-    public function setRepositories(array $repositories): void
+    public function setRepositories($repositories)
     {
         $this->repositories = $repositories;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function getRepositories(): array
+    public function getRepositories()
     {
         return $this->repositories;
     }
 
     /**
-     * @inheritDoc
+     * Set the license
+     *
+     * @param array $license
      */
-    public function setLicense(array $license): void
+    public function setLicense(array $license)
     {
         $this->license = $license;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function getLicense(): array
+    public function getLicense()
     {
         return $this->license;
     }
 
     /**
-     * @inheritDoc
+     * Set the keywords
+     *
+     * @param array $keywords
      */
-    public function setKeywords(array $keywords): void
+    public function setKeywords(array $keywords)
     {
         $this->keywords = $keywords;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function getKeywords(): array
+    public function getKeywords()
     {
         return $this->keywords;
     }
 
     /**
-     * @inheritDoc
+     * Set the authors
+     *
+     * @param array $authors
      */
-    public function setAuthors(array $authors): void
+    public function setAuthors(array $authors)
     {
         $this->authors = $authors;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function getAuthors(): array
+    public function getAuthors()
     {
         return $this->authors;
     }
 
     /**
-     * @inheritDoc
+     * Set the description
+     *
+     * @param string $description
      */
-    public function setDescription(?string $description): void
+    public function setDescription($description)
     {
         $this->description = $description;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function getDescription(): ?string
+    public function getDescription()
     {
         return $this->description;
     }
 
     /**
-     * @inheritDoc
+     * Set the homepage
+     *
+     * @param string $homepage
      */
-    public function setHomepage(?string $homepage): void
+    public function setHomepage($homepage)
     {
         $this->homepage = $homepage;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function getHomepage(): ?string
+    public function getHomepage()
     {
         return $this->homepage;
     }
 
     /**
-     * @inheritDoc
+     * Set the support information
+     *
+     * @param array $support
      */
-    public function setSupport(array $support): void
+    public function setSupport(array $support)
     {
         $this->support = $support;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function getSupport(): array
+    public function getSupport()
     {
         return $this->support;
     }
 
     /**
-     * @inheritDoc
+     * Set the funding
+     *
+     * @param array $funding
      */
-    public function setFunding(array $funding): void
+    public function setFunding(array $funding)
     {
         $this->funding = $funding;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function getFunding(): array
+    public function getFunding()
     {
         return $this->funding;
     }
 
     /**
-     * @inheritDoc
+     * @return bool
      */
-    public function isAbandoned(): bool
+    public function isAbandoned()
     {
         return (bool) $this->abandoned;
     }
 
     /**
-     * @inheritDoc
+     * @param bool|string $abandoned
      */
-    public function setAbandoned($abandoned): void
+    public function setAbandoned($abandoned)
     {
         $this->abandoned = $abandoned;
     }
 
     /**
-     * @inheritDoc
+     * If the package is abandoned and has a suggested replacement, this method returns it
+     *
+     * @return string|null
      */
-    public function getReplacementPackage(): ?string
+    public function getReplacementPackage()
     {
-        return \is_string($this->abandoned) ? $this->abandoned : null;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function setArchiveName(?string $name): void
-    {
-        $this->archiveName = $name;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getArchiveName(): ?string
-    {
-        return $this->archiveName;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function setArchiveExcludes(array $excludes): void
-    {
-        $this->archiveExcludes = $excludes;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getArchiveExcludes(): array
-    {
-        return $this->archiveExcludes;
+        return is_string($this->abandoned) ? $this->abandoned : null;
     }
 }

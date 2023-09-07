@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -19,8 +19,12 @@ class Zip
 {
     /**
      * Gets content of the root composer.json inside a ZIP archive.
+     *
+     * @param string $pathToZip
+     *
+     * @return string|null
      */
-    public static function getComposerJson(string $pathToZip): ?string
+    public static function getComposerJson($pathToZip)
     {
         if (!extension_loaded('zip')) {
             throw new \RuntimeException('The Zip Util requires PHP\'s zip extension');
@@ -31,13 +35,18 @@ class Zip
             return null;
         }
 
-        if (0 === $zip->numFiles) {
+        if (0 == $zip->numFiles) {
             $zip->close();
 
             return null;
         }
 
         $foundFileIndex = self::locateFile($zip, 'composer.json');
+        if (false === $foundFileIndex) {
+            $zip->close();
+
+            return null;
+        }
 
         $content = null;
         $configurationFileName = $zip->getNameIndex($foundFileIndex);
@@ -55,47 +64,44 @@ class Zip
     /**
      * Find a file by name, returning the one that has the shortest path.
      *
-     * @throws \RuntimeException
+     * @param \ZipArchive $zip
+     * @param string      $filename
+     *
+     * @return bool|int
      */
-    private static function locateFile(\ZipArchive $zip, string $filename): int
+    private static function locateFile(\ZipArchive $zip, $filename)
     {
-        // return root composer.json if it is there and is a file
-        if (false !== ($index = $zip->locateName($filename)) && $zip->getFromIndex($index) !== false) {
-            return $index;
-        }
+        $indexOfShortestMatch = false;
+        $lengthOfShortestMatch = -1;
 
-        $topLevelPaths = [];
         for ($i = 0; $i < $zip->numFiles; $i++) {
-            $name = $zip->getNameIndex($i);
-            $dirname = dirname($name);
-
-            // ignore OSX specific resource fork folder
-            if (strpos($name, '__MACOSX') !== false) {
-                continue;
-            }
-
-            // handle archives with proper TOC
-            if ($dirname === '.') {
-                $topLevelPaths[$name] = true;
-                if (\count($topLevelPaths) > 1) {
-                    throw new \RuntimeException('Archive has more than one top level directories, and no composer.json was found on the top level, so it\'s an invalid archive. Top level paths found were: '.implode(',', array_keys($topLevelPaths)));
+            $stat = $zip->statIndex($i);
+            if (strcmp(basename($stat['name']), $filename) === 0) {
+                $directoryName = dirname($stat['name']);
+                if ($directoryName === '.') {
+                    //if composer.json is in root directory
+                    //it has to be the one to use.
+                    return $i;
                 }
-                continue;
-            }
 
-            // handle archives which do not have a TOC record for the directory itself
-            if (false === strpos($dirname, '\\') && false === strpos($dirname, '/')) {
-                $topLevelPaths[$dirname.'/'] = true;
-                if (\count($topLevelPaths) > 1) {
-                    throw new \RuntimeException('Archive has more than one top level directories, and no composer.json was found on the top level, so it\'s an invalid archive. Top level paths found were: '.implode(',', array_keys($topLevelPaths)));
+                if (strpos($directoryName, '\\') !== false ||
+                    strpos($directoryName, '/') !== false) {
+                    //composer.json files below first directory are rejected
+                    continue;
+                }
+
+                $length = strlen($stat['name']);
+                if ($indexOfShortestMatch === false || $length < $lengthOfShortestMatch) {
+                    //Check it's not a directory.
+                    $contents = $zip->getFromIndex($i);
+                    if ($contents !== false) {
+                        $indexOfShortestMatch = $i;
+                        $lengthOfShortestMatch = $length;
+                    }
                 }
             }
         }
 
-        if ($topLevelPaths && false !== ($index = $zip->locateName(key($topLevelPaths).$filename)) && $zip->getFromIndex($index) !== false) {
-            return $index;
-        }
-
-        throw new \RuntimeException('No composer.json found either at the top level or within the topmost directory');
+        return $indexOfShortestMatch;
     }
 }

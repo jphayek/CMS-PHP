@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -12,11 +12,14 @@
 
 namespace Composer\Downloader;
 
-use React\Promise\PromiseInterface;
+use Composer\Config;
+use Composer\Cache;
+use Composer\EventDispatcher\EventDispatcher;
 use Composer\Util\IniHelper;
 use Composer\Util\Platform;
 use Composer\Util\ProcessExecutor;
-use Composer\Package\PackageInterface;
+use Composer\Util\RemoteFilesystem;
+use Composer\IO\IOInterface;
 use RarArchive;
 
 /**
@@ -28,7 +31,15 @@ use RarArchive;
  */
 class RarDownloader extends ArchiveDownloader
 {
-    protected function extract(PackageInterface $package, string $file, string $path): PromiseInterface
+    protected $process;
+
+    public function __construct(IOInterface $io, Config $config, EventDispatcher $eventDispatcher = null, Cache $cache = null, ProcessExecutor $process = null, RemoteFilesystem $rfs = null)
+    {
+        $this->process = $process ?: new ProcessExecutor($io);
+        parent::__construct($io, $config, $eventDispatcher, $cache, $rfs);
+    }
+
+    protected function extract($file, $path)
     {
         $processError = null;
 
@@ -37,7 +48,7 @@ class RarDownloader extends ArchiveDownloader
             $command = 'unrar x -- ' . ProcessExecutor::escape($file) . ' ' . ProcessExecutor::escape($path) . ' >/dev/null && chmod -R u+w ' . ProcessExecutor::escape($path);
 
             if (0 === $this->process->execute($command, $ignoredOutput)) {
-                return \React\Promise\resolve(null);
+                return;
             }
 
             $processError = 'Failed to execute ' . $command . "\n\n" . $this->process->getErrorOutput();
@@ -76,7 +87,5 @@ class RarDownloader extends ArchiveDownloader
         }
 
         $rarArchive->close();
-
-        return \React\Promise\resolve(null);
     }
 }

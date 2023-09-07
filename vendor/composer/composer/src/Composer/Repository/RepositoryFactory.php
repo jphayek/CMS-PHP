@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -16,9 +16,7 @@ use Composer\Factory;
 use Composer\IO\IOInterface;
 use Composer\Config;
 use Composer\EventDispatcher\EventDispatcher;
-use Composer\Pcre\Preg;
-use Composer\Util\HttpDownloader;
-use Composer\Util\ProcessExecutor;
+use Composer\Util\RemoteFilesystem;
 use Composer\Json\JsonFile;
 
 /**
@@ -27,23 +25,27 @@ use Composer\Json\JsonFile;
 class RepositoryFactory
 {
     /**
+     * @param  IOInterface $io
+     * @param  Config      $config
+     * @param  string      $repository
+     * @param  bool        $allowFilesystem
      * @return array|mixed
      */
-    public static function configFromString(IOInterface $io, Config $config, string $repository, bool $allowFilesystem = false)
+    public static function configFromString(IOInterface $io, Config $config, $repository, $allowFilesystem = false)
     {
         if (0 === strpos($repository, 'http')) {
-            $repoConfig = ['type' => 'composer', 'url' => $repository];
+            $repoConfig = array('type' => 'composer', 'url' => $repository);
         } elseif ("json" === pathinfo($repository, PATHINFO_EXTENSION)) {
-            $json = new JsonFile($repository, Factory::createHttpDownloader($io, $config));
+            $json = new JsonFile($repository, Factory::createRemoteFilesystem($io, $config));
             $data = $json->read();
             if (!empty($data['packages']) || !empty($data['includes']) || !empty($data['provider-includes'])) {
-                $repoConfig = ['type' => 'composer', 'url' => 'file://' . strtr(realpath($repository), '\\', '/')];
+                $repoConfig = array('type' => 'composer', 'url' => 'file://' . strtr(realpath($repository), '\\', '/'));
             } elseif ($allowFilesystem) {
-                $repoConfig = ['type' => 'filesystem', 'json' => $json];
+                $repoConfig = array('type' => 'filesystem', 'json' => $json);
             } else {
                 throw new \InvalidArgumentException("Invalid repository URL ($repository) given. This file does not contain a valid composer repository.");
             }
-        } elseif (strpos($repository, '{') === 0) {
+        } elseif ('{' === substr($repository, 0, 1)) {
             // assume it is a json object that makes a repo config
             $repoConfig = JsonFile::parseJson($repository);
         } else {
@@ -53,7 +55,14 @@ class RepositoryFactory
         return $repoConfig;
     }
 
-    public static function fromString(IOInterface $io, Config $config, string $repository, bool $allowFilesystem = false, ?RepositoryManager $rm = null): RepositoryInterface
+    /**
+     * @param  IOInterface         $io
+     * @param  Config              $config
+     * @param  string              $repository
+     * @param  bool                $allowFilesystem
+     * @return RepositoryInterface
+     */
+    public static function fromString(IOInterface $io, Config $config, $repository, $allowFilesystem = false, RepositoryManager $rm = null)
     {
         $repoConfig = static::configFromString($io, $config, $repository, $allowFilesystem);
 
@@ -61,65 +70,60 @@ class RepositoryFactory
     }
 
     /**
-     * @param  array<string, mixed> $repoConfig
+     * @param  IOInterface         $io
+     * @param  Config              $config
+     * @param  array               $repoConfig
+     * @return RepositoryInterface
      */
-    public static function createRepo(IOInterface $io, Config $config, array $repoConfig, ?RepositoryManager $rm = null): RepositoryInterface
+    public static function createRepo(IOInterface $io, Config $config, array $repoConfig, RepositoryManager $rm = null)
     {
         if (!$rm) {
-            @trigger_error('Not passing a repository manager when calling createRepo is deprecated since Composer 2.3.6', E_USER_DEPRECATED);
-            $rm = static::manager($io, $config);
+            $rm = static::manager($io, $config, null, Factory::createRemoteFilesystem($io, $config));
         }
-        $repos = self::createRepos($rm, [$repoConfig]);
+        $repos = static::createRepos($rm, array($repoConfig));
 
         return reset($repos);
     }
 
     /**
+     * @param  IOInterface|null       $io
+     * @param  Config|null            $config
+     * @param  RepositoryManager|null $rm
      * @return RepositoryInterface[]
      */
-    public static function defaultRepos(?IOInterface $io = null, ?Config $config = null, ?RepositoryManager $rm = null): array
+    public static function defaultRepos(IOInterface $io = null, Config $config = null, RepositoryManager $rm = null)
     {
-        if (null === $rm) {
-            @trigger_error('Not passing a repository manager when calling defaultRepos is deprecated since Composer 2.3.6, use defaultReposWithDefaultManager() instead if you cannot get a manager.', E_USER_DEPRECATED);
-        }
-
-        if (null === $config) {
+        if (!$config) {
             $config = Factory::createConfig($io);
         }
-        if (null !== $io) {
+        if ($io) {
             $io->loadConfiguration($config);
         }
-        if (null === $rm) {
-            if (null === $io) {
+        if (!$rm) {
+            if (!$io) {
                 throw new \InvalidArgumentException('This function requires either an IOInterface or a RepositoryManager');
             }
-            $rm = static::manager($io, $config, Factory::createHttpDownloader($io, $config));
+            $rm = static::manager($io, $config, null, Factory::createRemoteFilesystem($io, $config));
         }
 
-        return self::createRepos($rm, $config->getRepositories());
+        return static::createRepos($rm, $config->getRepositories());
     }
 
     /**
+     * @param  IOInterface       $io
+     * @param  Config            $config
      * @param  EventDispatcher   $eventDispatcher
-     * @param  HttpDownloader    $httpDownloader
+     * @param  RemoteFilesystem  $rfs
+     * @return RepositoryManager
      */
-    public static function manager(IOInterface $io, Config $config, ?HttpDownloader $httpDownloader = null, ?EventDispatcher $eventDispatcher = null, ?ProcessExecutor $process = null): RepositoryManager
+    public static function manager(IOInterface $io, Config $config, EventDispatcher $eventDispatcher = null, RemoteFilesystem $rfs = null)
     {
-        if ($httpDownloader === null) {
-            $httpDownloader = Factory::createHttpDownloader($io, $config);
-        }
-        if ($process === null) {
-            $process = new ProcessExecutor($io);
-            $process->enableAsync();
-        }
-
-        $rm = new RepositoryManager($io, $config, $httpDownloader, $eventDispatcher, $process);
+        $rm = new RepositoryManager($io, $config, $eventDispatcher, $rfs);
         $rm->setRepositoryClass('composer', 'Composer\Repository\ComposerRepository');
         $rm->setRepositoryClass('vcs', 'Composer\Repository\VcsRepository');
         $rm->setRepositoryClass('package', 'Composer\Repository\PackageRepository');
         $rm->setRepositoryClass('pear', 'Composer\Repository\PearRepository');
         $rm->setRepositoryClass('git', 'Composer\Repository\VcsRepository');
-        $rm->setRepositoryClass('bitbucket', 'Composer\Repository\VcsRepository');
         $rm->setRepositoryClass('git-bitbucket', 'Composer\Repository\VcsRepository');
         $rm->setRepositoryClass('github', 'Composer\Repository\VcsRepository');
         $rm->setRepositoryClass('gitlab', 'Composer\Repository\VcsRepository');
@@ -127,6 +131,7 @@ class RepositoryFactory
         $rm->setRepositoryClass('fossil', 'Composer\Repository\VcsRepository');
         $rm->setRepositoryClass('perforce', 'Composer\Repository\VcsRepository');
         $rm->setRepositoryClass('hg', 'Composer\Repository\VcsRepository');
+        $rm->setRepositoryClass('hg-bitbucket', 'Composer\Repository\VcsRepository');
         $rm->setRepositoryClass('artifact', 'Composer\Repository\ArtifactRepository');
         $rm->setRepositoryClass('path', 'Composer\Repository\PathRepository');
 
@@ -136,22 +141,9 @@ class RepositoryFactory
     /**
      * @return RepositoryInterface[]
      */
-    public static function defaultReposWithDefaultManager(IOInterface $io): array
+    private static function createRepos(RepositoryManager $rm, array $repoConfigs)
     {
-        $manager = RepositoryFactory::manager($io, $config = Factory::createConfig($io));
-        $io->loadConfiguration($config);
-
-        return RepositoryFactory::defaultRepos($io, $config, $manager);
-    }
-
-    /**
-     * @param array<int|string, mixed> $repoConfigs
-     *
-     * @return RepositoryInterface[]
-     */
-    private static function createRepos(RepositoryManager $rm, array $repoConfigs): array
-    {
-        $repos = [];
+        $repos = array();
 
         foreach ($repoConfigs as $index => $repo) {
             if (is_string($repo)) {
@@ -168,21 +160,16 @@ class RepositoryFactory
             if ($repo['type'] === 'filesystem') {
                 $repos[$name] = new FilesystemRepository($repo['json']);
             } else {
-                $repos[$name] = $rm->createRepository($repo['type'], $repo, (string) $index);
+                $repos[$name] = $rm->createRepository($repo['type'], $repo, $index);
             }
         }
 
         return $repos;
     }
 
-    /**
-     * @param int|string $index
-     * @param array{url?: string} $repo
-     * @param array<string, mixed> $existingRepos
-     */
-    public static function generateRepositoryName($index, array $repo, array $existingRepos): string
+    public static function generateRepositoryName($index, array $repo, array $existingRepos)
     {
-        $name = is_int($index) && isset($repo['url']) ? Preg::replace('{^https?://}i', '', $repo['url']) : (string) $index;
+        $name = is_int($index) && isset($repo['url']) ? preg_replace('{^https?://}i', '', $repo['url']) : $index;
         while (isset($existingRepos[$name])) {
             $name .= '2';
         }

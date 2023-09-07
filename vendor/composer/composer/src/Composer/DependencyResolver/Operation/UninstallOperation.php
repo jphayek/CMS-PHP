@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -19,38 +19,48 @@ use Composer\Package\PackageInterface;
  *
  * @author Konstantin Kudryashov <ever.zet@gmail.com>
  */
-class UninstallOperation extends SolverOperation implements OperationInterface
+class UninstallOperation extends SolverOperation
 {
-    protected const TYPE = 'uninstall';
-
-    /**
-     * @var PackageInterface
-     */
     protected $package;
 
-    public function __construct(PackageInterface $package)
+    /**
+     * Initializes operation.
+     *
+     * @param PackageInterface $package package instance
+     * @param string           $reason  operation reason
+     */
+    public function __construct(PackageInterface $package, $reason = null)
     {
+        parent::__construct($reason);
+
         $this->package = $package;
     }
 
     /**
      * Returns package instance.
+     *
+     * @return PackageInterface
      */
-    public function getPackage(): PackageInterface
+    public function getPackage()
     {
         return $this->package;
     }
 
     /**
-     * @inheritDoc
+     * Returns job type.
+     *
+     * @return string
      */
-    public function show($lock): string
+    public function getJobType()
     {
-        return self::format($this->package, $lock);
+        return 'uninstall';
     }
 
-    public static function format(PackageInterface $package, bool $lock = false): string
+    /**
+     * {@inheritDoc}
+     */
+    public function __toString()
     {
-        return 'Removing <info>'.$package->getPrettyName().'</info> (<comment>'.$package->getFullPrettyVersion().'</comment>)';
+        return 'Uninstalling '.$this->package->getPrettyName().' ('.$this->formatVersion($this->package).')';
     }
 }

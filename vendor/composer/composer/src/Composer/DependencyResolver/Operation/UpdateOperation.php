@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -20,69 +20,64 @@ use Composer\Package\Version\VersionParser;
  *
  * @author Konstantin Kudryashov <ever.zet@gmail.com>
  */
-class UpdateOperation extends SolverOperation implements OperationInterface
+class UpdateOperation extends SolverOperation
 {
-    protected const TYPE = 'update';
-
-    /**
-     * @var PackageInterface
-     */
     protected $initialPackage;
-
-    /**
-     * @var PackageInterface
-     */
     protected $targetPackage;
 
     /**
+     * Initializes update operation.
+     *
      * @param PackageInterface $initial initial package
      * @param PackageInterface $target  target package (updated)
+     * @param string           $reason  update reason
      */
-    public function __construct(PackageInterface $initial, PackageInterface $target)
+    public function __construct(PackageInterface $initial, PackageInterface $target, $reason = null)
     {
+        parent::__construct($reason);
+
         $this->initialPackage = $initial;
         $this->targetPackage = $target;
     }
 
     /**
      * Returns initial package.
+     *
+     * @return PackageInterface
      */
-    public function getInitialPackage(): PackageInterface
+    public function getInitialPackage()
     {
         return $this->initialPackage;
     }
 
     /**
      * Returns target package.
+     *
+     * @return PackageInterface
      */
-    public function getTargetPackage(): PackageInterface
+    public function getTargetPackage()
     {
         return $this->targetPackage;
     }
 
     /**
-     * @inheritDoc
+     * Returns job type.
+     *
+     * @return string
      */
-    public function show($lock): string
+    public function getJobType()
     {
-        return self::format($this->initialPackage, $this->targetPackage, $lock);
+        return 'update';
     }
 
-    public static function format(PackageInterface $initialPackage, PackageInterface $targetPackage, bool $lock = false): string
+    /**
+     * {@inheritDoc}
+     */
+    public function __toString()
     {
-        $fromVersion = $initialPackage->getFullPrettyVersion();
-        $toVersion = $targetPackage->getFullPrettyVersion();
+        $actionName = VersionParser::isUpgrade($this->initialPackage->getVersion(), $this->targetPackage->getVersion()) ? 'Updating' : 'Downgrading';
 
-        if ($fromVersion === $toVersion && $initialPackage->getSourceReference() !== $targetPackage->getSourceReference()) {
-            $fromVersion = $initialPackage->getFullPrettyVersion(true, PackageInterface::DISPLAY_SOURCE_REF);
-            $toVersion = $targetPackage->getFullPrettyVersion(true, PackageInterface::DISPLAY_SOURCE_REF);
-        } elseif ($fromVersion === $toVersion && $initialPackage->getDistReference() !== $targetPackage->getDistReference()) {
-            $fromVersion = $initialPackage->getFullPrettyVersion(true, PackageInterface::DISPLAY_DIST_REF);
-            $toVersion = $targetPackage->getFullPrettyVersion(true, PackageInterface::DISPLAY_DIST_REF);
-        }
-
-        $actionName = VersionParser::isUpgrade($initialPackage->getVersion(), $targetPackage->getVersion()) ? 'Upgrading' : 'Downgrading';
-
-        return $actionName.' <info>'.$initialPackage->getPrettyName().'</info> (<comment>'.$fromVersion.'</comment> => <comment>'.$toVersion.'</comment>)';
+        return $actionName.' '.$this->initialPackage->getPrettyName().' ('.$this->formatVersion($this->initialPackage).') to '.
+            $this->targetPackage->getPrettyName(). ' ('.$this->formatVersion($this->targetPackage).')';
     }
 }

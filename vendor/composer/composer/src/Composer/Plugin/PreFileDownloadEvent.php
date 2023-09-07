@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -13,7 +13,7 @@
 namespace Composer\Plugin;
 
 use Composer\EventDispatcher\Event;
-use Composer\Util\HttpDownloader;
+use Composer\Util\RemoteFilesystem;
 
 /**
  * The pre file download event.
@@ -23,136 +23,56 @@ use Composer\Util\HttpDownloader;
 class PreFileDownloadEvent extends Event
 {
     /**
-     * @var HttpDownloader
+     * @var RemoteFilesystem
      */
-    private $httpDownloader;
-
-    /**
-     * @var non-empty-string
-     */
-    private $processedUrl;
-
-    /**
-     * @var string|null
-     */
-    private $customCacheKey;
+    private $rfs;
 
     /**
      * @var string
      */
-    private $type;
-
-    /**
-     * @var mixed
-     */
-    private $context;
-
-    /**
-     * @var mixed[]
-     */
-    private $transportOptions = [];
+    private $processedUrl;
 
     /**
      * Constructor.
      *
-     * @param string           $name           The event name
-     * @param mixed            $context
-     * @param non-empty-string $processedUrl
+     * @param string           $name         The event name
+     * @param RemoteFilesystem $rfs
+     * @param string           $processedUrl
      */
-    public function __construct(string $name, HttpDownloader $httpDownloader, string $processedUrl, string $type, $context = null)
+    public function __construct($name, RemoteFilesystem $rfs, $processedUrl)
     {
         parent::__construct($name);
-        $this->httpDownloader = $httpDownloader;
+        $this->rfs = $rfs;
         $this->processedUrl = $processedUrl;
-        $this->type = $type;
-        $this->context = $context;
-    }
-
-    public function getHttpDownloader(): HttpDownloader
-    {
-        return $this->httpDownloader;
     }
 
     /**
-     * Retrieves the processed URL that will be downloaded.
+     * Returns the remote filesystem
      *
-     * @return non-empty-string
+     * @return RemoteFilesystem
      */
-    public function getProcessedUrl(): string
+    public function getRemoteFilesystem()
+    {
+        return $this->rfs;
+    }
+
+    /**
+     * Sets the remote filesystem
+     *
+     * @param RemoteFilesystem $rfs
+     */
+    public function setRemoteFilesystem(RemoteFilesystem $rfs)
+    {
+        $this->rfs = $rfs;
+    }
+
+    /**
+     * Retrieves the processed URL this remote filesystem will be used for
+     *
+     * @return string
+     */
+    public function getProcessedUrl()
     {
         return $this->processedUrl;
-    }
-
-    /**
-     * Sets the processed URL that will be downloaded.
-     *
-     * @param non-empty-string $processedUrl New processed URL
-     */
-    public function setProcessedUrl(string $processedUrl): void
-    {
-        $this->processedUrl = $processedUrl;
-    }
-
-    /**
-     * Retrieves a custom package cache key for this download.
-     */
-    public function getCustomCacheKey(): ?string
-    {
-        return $this->customCacheKey;
-    }
-
-    /**
-     * Sets a custom package cache key for this download.
-     *
-     * @param string|null $customCacheKey New cache key
-     */
-    public function setCustomCacheKey(?string $customCacheKey): void
-    {
-        $this->customCacheKey = $customCacheKey;
-    }
-
-    /**
-     * Returns the type of this download (package, metadata).
-     */
-    public function getType(): string
-    {
-        return $this->type;
-    }
-
-    /**
-     * Returns the context of this download, if any.
-     *
-     * If this download is of type package, the package object is returned.
-     * If the type is metadata, an array{repository: RepositoryInterface} is returned.
-     *
-     * @return mixed
-     */
-    public function getContext()
-    {
-        return $this->context;
-    }
-
-    /**
-     * Returns transport options for the download.
-     *
-     * Only available for events with type metadata, for packages set the transport options on the package itself.
-     *
-     * @return mixed[]
-     */
-    public function getTransportOptions(): array
-    {
-        return $this->transportOptions;
-    }
-
-    /**
-     * Sets transport options for the download.
-     *
-     * Only available for events with type metadata, for packages set the transport options on the package itself.
-     *
-     * @param mixed[] $options
-     */
-    public function setTransportOptions(array $options): void
-    {
-        $this->transportOptions = $options;
     }
 }

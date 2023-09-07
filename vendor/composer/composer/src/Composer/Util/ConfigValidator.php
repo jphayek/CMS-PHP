@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -18,10 +18,7 @@ use Composer\Package\Loader\InvalidPackageException;
 use Composer\Json\JsonValidationException;
 use Composer\IO\IOInterface;
 use Composer\Json\JsonFile;
-use Composer\Pcre\Preg;
 use Composer\Spdx\SpdxLicenses;
-use Seld\JsonLint\DuplicateKeyException;
-use Seld\JsonLint\JsonParser;
 
 /**
  * Validates a composer configuration.
@@ -31,9 +28,6 @@ use Seld\JsonLint\JsonParser;
  */
 class ConfigValidator
 {
-    public const CHECK_VERSION = 1;
-
-    /** @var IOInterface */
     private $io;
 
     public function __construct(IOInterface $io)
@@ -46,19 +40,17 @@ class ConfigValidator
      *
      * @param string $file                       The path to the file
      * @param int    $arrayLoaderValidationFlags Flags for ArrayLoader validation
-     * @param int    $flags                      Flags for validation
      *
-     * @return array{list<string>, list<string>, list<string>} a triple containing the errors, publishable errors, and warnings
+     * @return array a triple containing the errors, publishable errors, and warnings
      */
-    public function validate(string $file, int $arrayLoaderValidationFlags = ValidatingArrayLoader::CHECK_ALL, int $flags = self::CHECK_VERSION): array
+    public function validate($file, $arrayLoaderValidationFlags = ValidatingArrayLoader::CHECK_ALL)
     {
-        $errors = [];
-        $publishErrors = [];
-        $warnings = [];
+        $errors = array();
+        $publishErrors = array();
+        $warnings = array();
 
         // validate json schema
         $laxValid = false;
-        $manifest = null;
         try {
             $json = new JsonFile($file, null, $this->io);
             $manifest = $json->read();
@@ -77,17 +69,7 @@ class ConfigValidator
         } catch (\Exception $e) {
             $errors[] = $e->getMessage();
 
-            return [$errors, $publishErrors, $warnings];
-        }
-
-        if (is_array($manifest)) {
-            $jsonParser = new JsonParser();
-            try {
-                $jsonParser->parse((string) file_get_contents($file), JsonParser::DETECT_KEY_CONFLICTS);
-            } catch (DuplicateKeyException $e) {
-                $details = $e->getDetails();
-                $warnings[] = 'Key '.$details['key'].' is a duplicate in '.$file.' at line '.$details['line'];
-            }
+            return array($errors, $publishErrors, $warnings);
         }
 
         // validate actual data
@@ -107,12 +89,12 @@ class ConfigValidator
             foreach ($licenses as $license) {
                 $spdxLicense = $licenseValidator->getLicenseByIdentifier($license);
                 if ($spdxLicense && $spdxLicense[3]) {
-                    if (Preg::isMatch('{^[AL]?GPL-[123](\.[01])?\+$}i', $license)) {
+                    if (preg_match('{^[AL]?GPL-[123](\.[01])?\+$}i', $license)) {
                         $warnings[] = sprintf(
                             'License "%s" is a deprecated SPDX license identifier, use "'.str_replace('+', '', $license).'-or-later" instead',
                             $license
                         );
-                    } elseif (Preg::isMatch('{^[AL]?GPL-[123](\.[01])?$}i', $license)) {
+                    } elseif (preg_match('{^[AL]?GPL-[123](\.[01])?$}i', $license)) {
                         $warnings[] = sprintf(
                             'License "%s" is a deprecated SPDX license identifier, use "'.$license.'-only" or "'.$license.'-or-later" instead',
                             $license
@@ -127,12 +109,12 @@ class ConfigValidator
             }
         }
 
-        if (($flags & self::CHECK_VERSION) && isset($manifest['version'])) {
+        if (isset($manifest['version'])) {
             $warnings[] = 'The version field is present, it is recommended to leave it out if the package is published on Packagist.';
         }
 
-        if (!empty($manifest['name']) && Preg::isMatch('{[A-Z]}', $manifest['name'])) {
-            $suggestName = Preg::replace('{(?:([a-z])([A-Z])|([A-Z])([A-Z][a-z]))}', '\\1\\3-\\2\\4', $manifest['name']);
+        if (!empty($manifest['name']) && preg_match('{[A-Z]}', $manifest['name'])) {
+            $suggestName = preg_replace('{(?:([a-z])([A-Z])|([A-Z])([A-Z][a-z]))}', '\\1\\3-\\2\\4', $manifest['name']);
             $suggestName = strtolower($suggestName);
 
             $publishErrors[] = sprintf(
@@ -142,12 +124,12 @@ class ConfigValidator
             );
         }
 
-        if (!empty($manifest['type']) && $manifest['type'] === 'composer-installer') {
+        if (!empty($manifest['type']) && $manifest['type'] == 'composer-installer') {
             $warnings[] = "The package type 'composer-installer' is deprecated. Please distribute your custom installers as plugins from now on. See https://getcomposer.org/doc/articles/plugins.md for plugin documentation.";
         }
 
         // check for require-dev overrides
-        if (isset($manifest['require'], $manifest['require-dev'])) {
+        if (isset($manifest['require']) && isset($manifest['require-dev'])) {
             $requireOverrides = array_intersect_key($manifest['require'], $manifest['require-dev']);
 
             if (!empty($requireOverrides)) {
@@ -156,10 +138,11 @@ class ConfigValidator
             }
         }
 
+
         // check for meaningless provide/replace satisfying requirements
-        foreach (['provide', 'replace'] as $linkType) {
+        foreach (array('provide', 'replace') as $linkType) {
             if (isset($manifest[$linkType])) {
-                foreach (['require', 'require-dev'] as $requireType) {
+                foreach (array('require', 'require-dev') as $requireType) {
                     if (isset($manifest[$requireType])) {
                         foreach ($manifest[$linkType] as $provide => $constraint) {
                             if (isset($manifest[$requireType][$provide])) {
@@ -172,11 +155,11 @@ class ConfigValidator
         }
 
         // check for commit references
-        $require = $manifest['require'] ?? [];
-        $requireDev = $manifest['require-dev'] ?? [];
+        $require = isset($manifest['require']) ? $manifest['require'] : array();
+        $requireDev = isset($manifest['require-dev']) ? $manifest['require-dev'] : array();
         $packages = array_merge($require, $requireDev);
         foreach ($packages as $package => $version) {
-            if (Preg::isMatch('/#/', $version)) {
+            if (preg_match('/#/', $version) === 1) {
                 $warnings[] = sprintf(
                     'The package "%s" is pointing to a commit-ref, this is bad practice and can cause unforeseen issues.',
                     $package
@@ -185,8 +168,8 @@ class ConfigValidator
         }
 
         // report scripts-descriptions for non-existent scripts
-        $scriptsDescriptions = $manifest['scripts-descriptions'] ?? [];
-        $scripts = $manifest['scripts'] ?? [];
+        $scriptsDescriptions = isset($manifest['scripts-descriptions']) ? $manifest['scripts-descriptions'] : array();
+        $scripts = isset($manifest['scripts']) ? $manifest['scripts'] : array();
         foreach ($scriptsDescriptions as $scriptName => $scriptDescription) {
             if (!array_key_exists($scriptName, $scripts)) {
                 $warnings[] = sprintf(
@@ -204,8 +187,8 @@ class ConfigValidator
             $warnings[] = "Defining autoload.psr-4 with an empty namespace prefix is a bad idea for performance";
         }
 
-        $loader = new ValidatingArrayLoader(new ArrayLoader(), true, null, $arrayLoaderValidationFlags);
         try {
+            $loader = new ValidatingArrayLoader(new ArrayLoader(), true, null, $arrayLoaderValidationFlags);
             if (!isset($manifest['version'])) {
                 $manifest['version'] = '1.0.0';
             }
@@ -219,6 +202,6 @@ class ConfigValidator
 
         $warnings = array_merge($warnings, $loader->getWarnings());
 
-        return [$errors, $publishErrors, $warnings];
+        return array($errors, $publishErrors, $warnings);
     }
 }

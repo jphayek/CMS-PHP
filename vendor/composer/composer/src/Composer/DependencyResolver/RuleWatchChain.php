@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -19,16 +19,17 @@ namespace Composer\DependencyResolver;
  * method to set the internal iterator to a particular offset.
  *
  * @author Nils Adermann <naderman@naderman.de>
- * @extends \SplDoublyLinkedList<RuleWatchNode>
  */
 class RuleWatchChain extends \SplDoublyLinkedList
 {
+    protected $offset = 0;
+
     /**
      * Moves the internal iterator to the specified offset
      *
      * @param int $offset The offset to seek to.
      */
-    public function seek(int $offset): void
+    public function seek($offset)
     {
         $this->rewind();
         for ($i = 0; $i < $offset; $i++, $this->next());
@@ -42,7 +43,7 @@ class RuleWatchChain extends \SplDoublyLinkedList
      * this method sets the internal iterator back to the following element
      * using the seek method.
      */
-    public function remove(): void
+    public function remove()
     {
         $offset = $this->key();
         $this->offsetUnset($offset);

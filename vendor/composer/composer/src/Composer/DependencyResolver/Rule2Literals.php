@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -12,26 +12,27 @@
 
 namespace Composer\DependencyResolver;
 
+use Composer\Package\PackageInterface;
+use Composer\Package\Link;
+
 /**
  * @author Nils Adermann <naderman@naderman.de>
- * @phpstan-import-type ReasonData from Rule
  */
 class Rule2Literals extends Rule
 {
-    /** @var int */
     protected $literal1;
-    /** @var int */
     protected $literal2;
 
     /**
-     * @param Rule::RULE_* $reason A RULE_* constant
-     * @param mixed $reasonData
-     *
-     * @phpstan-param ReasonData $reasonData
+     * @param int                   $literal1
+     * @param int                   $literal2
+     * @param int                   $reason     A RULE_* constant describing the reason for generating this rule
+     * @param Link|PackageInterface $reasonData
+     * @param array                 $job        The job this rule was created from
      */
-    public function __construct(int $literal1, int $literal2, $reason, $reasonData)
+    public function __construct($literal1, $literal2, $reason, $reasonData, $job = null)
     {
-        parent::__construct($reason, $reasonData);
+        parent::__construct($reason, $reasonData, $job);
 
         if ($literal1 < $literal2) {
             $this->literal1 = $literal1;
@@ -42,17 +43,11 @@ class Rule2Literals extends Rule
         }
     }
 
-    /**
-     * @return list<int>
-     */
-    public function getLiterals(): array
+    public function getLiterals()
     {
-        return [$this->literal1, $this->literal2];
+        return array($this->literal1, $this->literal2);
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getHash()
     {
         return $this->literal1.','.$this->literal2;
@@ -66,7 +61,7 @@ class Rule2Literals extends Rule
      * @param  Rule $rule The rule to check against
      * @return bool Whether the rules are equal
      */
-    public function equals(Rule $rule): bool
+    public function equals(Rule $rule)
     {
         // specialized fast-case
         if ($rule instanceof self) {
@@ -82,7 +77,7 @@ class Rule2Literals extends Rule
         }
 
         $literals = $rule->getLiterals();
-        if (2 !== \count($literals)) {
+        if (2 != count($literals)) {
             return false;
         }
 
@@ -97,16 +92,17 @@ class Rule2Literals extends Rule
         return true;
     }
 
-    /** @return false */
-    public function isAssertion(): bool
+    public function isAssertion()
     {
         return false;
     }
 
     /**
      * Formats a rule as a string of the format (Literal1|Literal2|...)
+     *
+     * @return string
      */
-    public function __toString(): string
+    public function __toString()
     {
         $result = $this->isDisabled() ? 'disabled(' : '(';
 

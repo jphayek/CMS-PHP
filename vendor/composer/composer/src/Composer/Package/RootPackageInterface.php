@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -15,155 +15,128 @@ namespace Composer\Package;
 /**
  * Defines additional fields that are only needed for the root package
  *
- * PackageInterface & derivatives are considered internal, you may use them in type hints but extending/implementing them is not recommended and not supported. Things may change without notice.
- *
  * @author Jordi Boggiano <j.boggiano@seld.be>
- *
- * @phpstan-import-type AutoloadRules from PackageInterface
- * @phpstan-import-type DevAutoloadRules from PackageInterface
  */
 interface RootPackageInterface extends CompletePackageInterface
 {
     /**
      * Returns a set of package names and their aliases
      *
-     * @return list<array{package: string, version: string, alias: string, alias_normalized: string}>
+     * @return array
      */
-    public function getAliases(): array;
+    public function getAliases();
 
     /**
      * Returns the minimum stability of the package
+     *
+     * @return string
      */
-    public function getMinimumStability(): string;
+    public function getMinimumStability();
 
     /**
      * Returns the stability flags to apply to dependencies
      *
      * array('foo/bar' => 'dev')
      *
-     * @return array<string, BasePackage::STABILITY_*>
+     * @return array
      */
-    public function getStabilityFlags(): array;
+    public function getStabilityFlags();
 
     /**
      * Returns a set of package names and source references that must be enforced on them
      *
      * array('foo/bar' => 'abcd1234')
      *
-     * @return array<string, string>
+     * @return array
      */
-    public function getReferences(): array;
+    public function getReferences();
 
     /**
      * Returns true if the root package prefers picking stable packages over unstable ones
+     *
+     * @return bool
      */
-    public function getPreferStable(): bool;
+    public function getPreferStable();
 
     /**
      * Returns the root package's configuration
      *
-     * @return mixed[]
+     * @return array
      */
-    public function getConfig(): array;
+    public function getConfig();
 
     /**
      * Set the required packages
      *
      * @param Link[] $requires A set of package links
      */
-    public function setRequires(array $requires): void;
+    public function setRequires(array $requires);
 
     /**
      * Set the recommended packages
      *
      * @param Link[] $devRequires A set of package links
      */
-    public function setDevRequires(array $devRequires): void;
+    public function setDevRequires(array $devRequires);
 
     /**
      * Set the conflicting packages
      *
      * @param Link[] $conflicts A set of package links
      */
-    public function setConflicts(array $conflicts): void;
+    public function setConflicts(array $conflicts);
 
     /**
      * Set the provided virtual packages
      *
      * @param Link[] $provides A set of package links
      */
-    public function setProvides(array $provides): void;
+    public function setProvides(array $provides);
 
     /**
      * Set the packages this one replaces
      *
      * @param Link[] $replaces A set of package links
      */
-    public function setReplaces(array $replaces): void;
+    public function setReplaces(array $replaces);
+
+    /**
+     * Set the repositories
+     *
+     * @param array $repositories
+     */
+    public function setRepositories($repositories);
 
     /**
      * Set the autoload mapping
      *
      * @param array $autoload Mapping of autoloading rules
-     * @phpstan-param AutoloadRules $autoload
      */
-    public function setAutoload(array $autoload): void;
+    public function setAutoload(array $autoload);
 
     /**
      * Set the dev autoload mapping
      *
      * @param array $devAutoload Mapping of dev autoloading rules
-     * @phpstan-param DevAutoloadRules $devAutoload
      */
-    public function setDevAutoload(array $devAutoload): void;
+    public function setDevAutoload(array $devAutoload);
 
     /**
      * Set the stabilityFlags
      *
-     * @param array<string, BasePackage::STABILITY_*> $stabilityFlags
+     * @param array $stabilityFlags
      */
-    public function setStabilityFlags(array $stabilityFlags): void;
-
-    /**
-     * Set the minimumStability
-     */
-    public function setMinimumStability(string $minimumStability): void;
-
-    /**
-     * Set the preferStable
-     */
-    public function setPreferStable(bool $preferStable): void;
-
-    /**
-     * Set the config
-     *
-     * @param mixed[] $config
-     */
-    public function setConfig(array $config): void;
-
-    /**
-     * Set the references
-     *
-     * @param array<string, string> $references
-     */
-    public function setReferences(array $references): void;
-
-    /**
-     * Set the aliases
-     *
-     * @param list<array{package: string, version: string, alias: string, alias_normalized: string}> $aliases
-     */
-    public function setAliases(array $aliases): void;
+    public function setStabilityFlags(array $stabilityFlags);
 
     /**
      * Set the suggested packages
      *
-     * @param array<string, string> $suggests A set of package names/comments
+     * @param array $suggests A set of package names/comments
      */
-    public function setSuggests(array $suggests): void;
+    public function setSuggests(array $suggests);
 
     /**
-     * @param mixed[] $extra
+     * @param array $extra
      */
-    public function setExtra(array $extra): void;
+    public function setExtra(array $extra);
 }

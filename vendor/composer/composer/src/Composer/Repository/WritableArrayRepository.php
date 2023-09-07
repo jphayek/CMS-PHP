@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -12,7 +12,7 @@
 
 namespace Composer\Repository;
 
-use Composer\Installer\InstallationManager;
+use Composer\Package\AliasPackage;
 
 /**
  * Writable array repository.
@@ -21,53 +21,46 @@ use Composer\Installer\InstallationManager;
  */
 class WritableArrayRepository extends ArrayRepository implements WritableRepositoryInterface
 {
-    use CanonicalPackagesTrait;
-
     /**
-     * @var string[]
+     * {@inheritDoc}
      */
-    protected $devPackageNames = [];
-
-    /** @var bool|null */
-    private $devMode = null;
-
-    /**
-     * @return bool|null true if dev requirements were installed, false if --no-dev was used, null if yet unknown
-     */
-    public function getDevMode()
+    public function write()
     {
-        return $this->devMode;
     }
 
     /**
-     * @inheritDoc
-     */
-    public function setDevPackageNames(array $devPackageNames)
-    {
-        $this->devPackageNames = $devPackageNames;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getDevPackageNames()
-    {
-        return $this->devPackageNames;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function write(bool $devMode, InstallationManager $installationManager)
-    {
-        $this->devMode = $devMode;
-    }
-
-    /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function reload()
     {
-        $this->devMode = null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getCanonicalPackages()
+    {
+        $packages = $this->getPackages();
+
+        // get at most one package of each name, preferring non-aliased ones
+        $packagesByName = array();
+        foreach ($packages as $package) {
+            if (!isset($packagesByName[$package->getName()]) || $packagesByName[$package->getName()] instanceof AliasPackage) {
+                $packagesByName[$package->getName()] = $package;
+            }
+        }
+
+        $canonicalPackages = array();
+
+        // unfold aliased packages
+        foreach ($packagesByName as $package) {
+            while ($package instanceof AliasPackage) {
+                $package = $package->getAliasOf();
+            }
+
+            $canonicalPackages[] = $package;
+        }
+
+        return $canonicalPackages;
     }
 }

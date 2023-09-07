@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -13,7 +13,6 @@
 namespace Composer\Repository;
 
 use Composer\Package\PackageInterface;
-use Composer\Installer\InstallationManager;
 
 /**
  * Writable repository interface.
@@ -24,17 +23,13 @@ interface WritableRepositoryInterface extends RepositoryInterface
 {
     /**
      * Writes repository (f.e. to the disc).
-     *
-     * @param bool $devMode Whether dev requirements were included or not in this installation
-     * @return void
      */
-    public function write(bool $devMode, InstallationManager $installationManager);
+    public function write();
 
     /**
      * Adds package to the repository.
      *
      * @param PackageInterface $package package instance
-     * @return void
      */
     public function addPackage(PackageInterface $package);
 
@@ -42,7 +37,6 @@ interface WritableRepositoryInterface extends RepositoryInterface
      * Removes package from the repository.
      *
      * @param PackageInterface $package package instance
-     * @return void
      */
     public function removePackage(PackageInterface $package);
 
@@ -55,19 +49,6 @@ interface WritableRepositoryInterface extends RepositoryInterface
 
     /**
      * Forces a reload of all packages.
-     *
-     * @return void
      */
     public function reload();
-
-    /**
-     * @param string[] $devPackageNames
-     * @return void
-     */
-    public function setDevPackageNames(array $devPackageNames);
-
-    /**
-     * @return string[] Names of dependencies installed through require-dev
-     */
-    public function getDevPackageNames();
 }

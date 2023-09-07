@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -13,21 +13,15 @@
 namespace Composer\DependencyResolver;
 
 use Composer\Package\PackageInterface;
-use Composer\Semver\Constraint\Constraint;
 
 /**
  * @author Nils Adermann <naderman@naderman.de>
  */
 interface PolicyInterface
 {
-    /**
-     * @phpstan-param Constraint::STR_OP_* $operator
-     */
-    public function versionCompare(PackageInterface $a, PackageInterface $b, string $operator): bool;
+    public function versionCompare(PackageInterface $a, PackageInterface $b, $operator);
 
-    /**
-     * @param  int[]   $literals
-     * @return int[]
-     */
-    public function selectPreferredPackages(Pool $pool, array $literals, ?string $requiredPackage = null): array;
+    public function findUpdatePackages(Pool $pool, array $installedMap, PackageInterface $package);
+
+    public function selectPreferredPackages(Pool $pool, array $installedMap, array $literals, $requiredPackage = null);
 }

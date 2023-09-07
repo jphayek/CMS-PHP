@@ -59,132 +59,61 @@
         ]
     },
     {
-        "name": "composer/class-map-generator",
-        "version": "1.1.0",
-        "version_normalized": "1.1.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/composer/class-map-generator.git",
-            "reference": "953cc4ea32e0c31f2185549c7d216d7921f03da9"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/composer/class-map-generator/zipball/953cc4ea32e0c31f2185549c7d216d7921f03da9",
-            "reference": "953cc4ea32e0c31f2185549c7d216d7921f03da9",
-            "shasum": ""
-        },
-        "require": {
-            "composer/pcre": "^2.1 || ^3.1",
-            "php": "^7.2 || ^8.0",
-            "symfony/finder": "^4.4 || ^5.3 || ^6 || ^7"
-        },
-        "require-dev": {
-            "phpstan/phpstan": "^1.6",
-            "phpstan/phpstan-deprecation-rules": "^1",
-            "phpstan/phpstan-phpunit": "^1",
-            "phpstan/phpstan-strict-rules": "^1.1",
-            "symfony/filesystem": "^5.4 || ^6",
-            "symfony/phpunit-bridge": "^5"
-        },
-        "time": "2023-06-30T13:58:57+00:00",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-main": "1.x-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Composer\\ClassMapGenerator\\": "src"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Jordi Boggiano",
-                "email": "j.boggiano@seld.be",
-                "homepage": "https://seld.be"
-            }
-        ],
-        "description": "Utilities to scan PHP code and generate class maps.",
-        "keywords": [
-            "classmap"
-        ]
-    },
-    {
         "name": "composer/composer",
-        "version": "2.6.2",
-        "version_normalized": "2.6.2.0",
+        "version": "1.10.26",
+        "version_normalized": "1.10.26.0",
         "source": {
             "type": "git",
             "url": "https://github.com/composer/composer.git",
-            "reference": "623e5e1de055e65bc6c3c61b8348dc4662d75e2b"
+            "reference": "3e196135eacf9e519a6b00986bc6fe6aff977997"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/composer/composer/zipball/623e5e1de055e65bc6c3c61b8348dc4662d75e2b",
-            "reference": "623e5e1de055e65bc6c3c61b8348dc4662d75e2b",
+            "url": "https://api.github.com/repos/composer/composer/zipball/3e196135eacf9e519a6b00986bc6fe6aff977997",
+            "reference": "3e196135eacf9e519a6b00986bc6fe6aff977997",
             "shasum": ""
         },
         "require": {
             "composer/ca-bundle": "^1.0",
-            "composer/class-map-generator": "^1.0",
-            "composer/metadata-minifier": "^1.0",
-            "composer/pcre": "^2.1 || ^3.1",
-            "composer/semver": "^3.2.5",
-            "composer/spdx-licenses": "^1.5.7",
-            "composer/xdebug-handler": "^2.0.2 || ^3.0.3",
-            "justinrainbow/json-schema": "^5.2.11",
-            "php": "^7.2.5 || ^8.0",
-            "psr/log": "^1.0 || ^2.0 || ^3.0",
-            "react/promise": "^2.8 || ^3",
+            "composer/semver": "^1.0",
+            "composer/spdx-licenses": "^1.2",
+            "composer/xdebug-handler": "^1.1",
+            "justinrainbow/json-schema": "^5.2.10",
+            "php": "^5.3.2 || ^7.0 || ^8.0",
+            "psr/log": "^1.0",
             "seld/jsonlint": "^1.4",
-            "seld/phar-utils": "^1.2",
-            "seld/signal-handler": "^2.0",
-            "symfony/console": "^5.4.11 || ^6.0.11 || ^7",
-            "symfony/filesystem": "^5.4 || ^6.0 || ^7",
-            "symfony/finder": "^5.4 || ^6.0 || ^7",
-            "symfony/polyfill-php73": "^1.24",
-            "symfony/polyfill-php80": "^1.24",
-            "symfony/polyfill-php81": "^1.24",
-            "symfony/process": "^5.4 || ^6.0 || ^7"
+            "seld/phar-utils": "^1.0",
+            "symfony/console": "^2.7 || ^3.0 || ^4.0 || ^5.0",
+            "symfony/filesystem": "^2.7 || ^3.0 || ^4.0 || ^5.0",
+            "symfony/finder": "^2.7 || ^3.0 || ^4.0 || ^5.0",
+            "symfony/process": "^2.7 || ^3.0 || ^4.0 || ^5.0"
+        },
+        "conflict": {
+            "symfony/console": "2.8.38"
         },
         "require-dev": {
-            "phpstan/phpstan": "^1.9.3",
-            "phpstan/phpstan-deprecation-rules": "^1",
-            "phpstan/phpstan-phpunit": "^1.0",
-            "phpstan/phpstan-strict-rules": "^1",
-            "phpstan/phpstan-symfony": "^1.2.10",
-            "symfony/phpunit-bridge": "^6.0 || ^7"
+            "phpspec/prophecy": "^1.10",
+            "symfony/phpunit-bridge": "^4.2"
         },
         "suggest": {
             "ext-openssl": "Enabling the openssl extension allows you to access https URLs for repositories and packages",
             "ext-zip": "Enabling the zip extension allows you to unzip archives",
             "ext-zlib": "Allow gzip compression of HTTP requests"
         },
-        "time": "2023-09-03T12:09:15+00:00",
+        "time": "2022-04-13T14:39:56+00:00",
         "bin": [
             "bin/composer"
         ],
         "type": "library",
         "extra": {
             "branch-alias": {
-                "dev-main": "2.6-dev"
-            },
-            "phpstan": {
-                "includes": [
-                    "phpstan/rules.neon"
-                ]
+                "dev-master": "1.10-dev"
             }
         },
         "installation-source": "dist",
         "autoload": {
             "psr-4": {
-                "Composer\\": "src/Composer/"
+                "Composer\\": "src/Composer"
             }
         },
         "notification-url": "https://packagist.org/downloads/",
@@ -195,12 +124,12 @@
             {
                 "name": "Nils Adermann",
                 "email": "naderman@naderman.de",
-                "homepage": "https://www.naderman.de"
+                "homepage": "http://www.naderman.de"
             },
             {
                 "name": "Jordi Boggiano",
                 "email": "j.boggiano@seld.be",
-                "homepage": "https://seld.be"
+                "homepage": "http://seld.be"
             }
         ],
         "description": "Composer helps you declare, manage and install dependencies of PHP projects. It ensures you have the right stack everywhere.",
@@ -212,140 +141,31 @@
         ]
     },
     {
-        "name": "composer/metadata-minifier",
-        "version": "1.0.0",
-        "version_normalized": "1.0.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/composer/metadata-minifier.git",
-            "reference": "c549d23829536f0d0e984aaabbf02af91f443207"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/composer/metadata-minifier/zipball/c549d23829536f0d0e984aaabbf02af91f443207",
-            "reference": "c549d23829536f0d0e984aaabbf02af91f443207",
-            "shasum": ""
-        },
-        "require": {
-            "php": "^5.3.2 || ^7.0 || ^8.0"
-        },
-        "require-dev": {
-            "composer/composer": "^2",
-            "phpstan/phpstan": "^0.12.55",
-            "symfony/phpunit-bridge": "^4.2 || ^5"
-        },
-        "time": "2021-04-07T13:37:33+00:00",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-main": "1.x-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Composer\\MetadataMinifier\\": "src"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Jordi Boggiano",
-                "email": "j.boggiano@seld.be",
-                "homepage": "http://seld.be"
-            }
-        ],
-        "description": "Small utility library that handles metadata minification and expansion.",
-        "keywords": [
-            "composer",
-            "compression"
-        ]
-    },
-    {
-        "name": "composer/pcre",
-        "version": "3.1.0",
-        "version_normalized": "3.1.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/composer/pcre.git",
-            "reference": "4bff79ddd77851fe3cdd11616ed3f92841ba5bd2"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/composer/pcre/zipball/4bff79ddd77851fe3cdd11616ed3f92841ba5bd2",
-            "reference": "4bff79ddd77851fe3cdd11616ed3f92841ba5bd2",
-            "shasum": ""
-        },
-        "require": {
-            "php": "^7.4 || ^8.0"
-        },
-        "require-dev": {
-            "phpstan/phpstan": "^1.3",
-            "phpstan/phpstan-strict-rules": "^1.1",
-            "symfony/phpunit-bridge": "^5"
-        },
-        "time": "2022-11-17T09:50:14+00:00",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-main": "3.x-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Composer\\Pcre\\": "src"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Jordi Boggiano",
-                "email": "j.boggiano@seld.be",
-                "homepage": "http://seld.be"
-            }
-        ],
-        "description": "PCRE wrapping library that offers type-safe preg_* replacements.",
-        "keywords": [
-            "PCRE",
-            "preg",
-            "regex",
-            "regular expression"
-        ]
-    },
-    {
         "name": "composer/semver",
-        "version": "3.4.0",
-        "version_normalized": "3.4.0.0",
+        "version": "1.7.2",
+        "version_normalized": "1.7.2.0",
         "source": {
             "type": "git",
             "url": "https://github.com/composer/semver.git",
-            "reference": "35e8d0af4486141bc745f23a29cc2091eb624a32"
+            "reference": "647490bbcaf7fc4891c58f47b825eb99d19c377a"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/composer/semver/zipball/35e8d0af4486141bc745f23a29cc2091eb624a32",
-            "reference": "35e8d0af4486141bc745f23a29cc2091eb624a32",
+            "url": "https://api.github.com/repos/composer/semver/zipball/647490bbcaf7fc4891c58f47b825eb99d19c377a",
+            "reference": "647490bbcaf7fc4891c58f47b825eb99d19c377a",
             "shasum": ""
         },
         "require": {
             "php": "^5.3.2 || ^7.0 || ^8.0"
         },
         "require-dev": {
-            "phpstan/phpstan": "^1.4",
-            "symfony/phpunit-bridge": "^4.2 || ^5"
+            "phpunit/phpunit": "^4.5 || ^5.0.5"
         },
-        "time": "2023-08-31T09:50:34+00:00",
+        "time": "2020-12-03T15:47:16+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
-                "dev-main": "3.x-dev"
+                "dev-master": "1.x-dev"
             }
         },
         "installation-source": "dist",
@@ -448,30 +268,28 @@
     },
     {
         "name": "composer/xdebug-handler",
-        "version": "3.0.3",
-        "version_normalized": "3.0.3.0",
+        "version": "1.4.6",
+        "version_normalized": "1.4.6.0",
         "source": {
             "type": "git",
             "url": "https://github.com/composer/xdebug-handler.git",
-            "reference": "ced299686f41dce890debac69273b47ffe98a40c"
+            "reference": "f27e06cd9675801df441b3656569b328e04aa37c"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/composer/xdebug-handler/zipball/ced299686f41dce890debac69273b47ffe98a40c",
-            "reference": "ced299686f41dce890debac69273b47ffe98a40c",
+            "url": "https://api.github.com/repos/composer/xdebug-handler/zipball/f27e06cd9675801df441b3656569b328e04aa37c",
+            "reference": "f27e06cd9675801df441b3656569b328e04aa37c",
             "shasum": ""
         },
         "require": {
-            "composer/pcre": "^1 || ^2 || ^3",
-            "php": "^7.2.5 || ^8.0",
-            "psr/log": "^1 || ^2 || ^3"
+            "php": "^5.3.2 || ^7.0 || ^8.0",
+            "psr/log": "^1.0"
         },
         "require-dev": {
-            "phpstan/phpstan": "^1.0",
-            "phpstan/phpstan-strict-rules": "^1.1",
-            "symfony/phpunit-bridge": "^6.0"
+            "phpstan/phpstan": "^0.12.55",
+            "symfony/phpunit-bridge": "^4.2 || ^5"
         },
-        "time": "2022-02-25T21:32:43+00:00",
+        "time": "2021-03-25T17:01:18+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -706,33 +524,33 @@
     },
     {
         "name": "psr/log",
-        "version": "3.0.0",
-        "version_normalized": "3.0.0.0",
+        "version": "1.1.4",
+        "version_normalized": "1.1.4.0",
         "source": {
             "type": "git",
             "url": "https://github.com/php-fig/log.git",
-            "reference": "fe5ea303b0887d5caefd3d431c3e61ad47037001"
+            "reference": "d49695b909c3b7628b6289db5479a1c204601f11"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/php-fig/log/zipball/fe5ea303b0887d5caefd3d431c3e61ad47037001",
-            "reference": "fe5ea303b0887d5caefd3d431c3e61ad47037001",
+            "url": "https://api.github.com/repos/php-fig/log/zipball/d49695b909c3b7628b6289db5479a1c204601f11",
+            "reference": "d49695b909c3b7628b6289db5479a1c204601f11",
             "shasum": ""
         },
         "require": {
-            "php": ">=8.0.0"
+            "php": ">=5.3.0"
         },
-        "time": "2021-07-14T16:46:02+00:00",
+        "time": "2021-05-03T11:20:27+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
-                "dev-master": "3.x-dev"
+                "dev-master": "1.1.x-dev"
             }
         },
         "installation-source": "dist",
         "autoload": {
             "psr-4": {
-                "Psr\\Log\\": "src"
+                "Psr\\Log\\": "Psr/Log/"
             }
         },
         "notification-url": "https://packagist.org/downloads/",
@@ -751,71 +569,6 @@
             "log",
             "psr",
             "psr-3"
-        ]
-    },
-    {
-        "name": "react/promise",
-        "version": "v3.0.0",
-        "version_normalized": "3.0.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/reactphp/promise.git",
-            "reference": "c86753c76fd3be465d93b308f18d189f01a22be4"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/reactphp/promise/zipball/c86753c76fd3be465d93b308f18d189f01a22be4",
-            "reference": "c86753c76fd3be465d93b308f18d189f01a22be4",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=7.1.0"
-        },
-        "require-dev": {
-            "phpstan/phpstan": "1.10.20 || 1.4.10",
-            "phpunit/phpunit": "^9.5 || ^7.5"
-        },
-        "time": "2023-07-11T16:12:49+00:00",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "files": [
-                "src/functions_include.php"
-            ],
-            "psr-4": {
-                "React\\Promise\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Jan Sorgalla",
-                "email": "jsorgalla@gmail.com",
-                "homepage": "https://sorgalla.com/"
-            },
-            {
-                "name": "Christian Lück",
-                "email": "christian@clue.engineering",
-                "homepage": "https://clue.engineering/"
-            },
-            {
-                "name": "Cees-Jan Kiewiet",
-                "email": "reactphp@ceesjankiewiet.nl",
-                "homepage": "https://wyrihaximus.net/"
-            },
-            {
-                "name": "Chris Boden",
-                "email": "cboden@gmail.com",
-                "homepage": "https://cboden.dev/"
-            }
-        ],
-        "description": "A lightweight implementation of CommonJS Promises/A for PHP",
-        "keywords": [
-            "promise",
-            "promises"
         ]
     },
     {
@@ -917,106 +670,56 @@
         ]
     },
     {
-        "name": "seld/signal-handler",
-        "version": "2.0.2",
-        "version_normalized": "2.0.2.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/Seldaek/signal-handler.git",
-            "reference": "04a6112e883ad76c0ada8e4a9f7520bbfdb6bb98"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/Seldaek/signal-handler/zipball/04a6112e883ad76c0ada8e4a9f7520bbfdb6bb98",
-            "reference": "04a6112e883ad76c0ada8e4a9f7520bbfdb6bb98",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=7.2.0"
-        },
-        "require-dev": {
-            "phpstan/phpstan": "^1",
-            "phpstan/phpstan-deprecation-rules": "^1.0",
-            "phpstan/phpstan-phpunit": "^1",
-            "phpstan/phpstan-strict-rules": "^1.3",
-            "phpunit/phpunit": "^7.5.20 || ^8.5.23",
-            "psr/log": "^1 || ^2 || ^3"
-        },
-        "time": "2023-09-03T09:24:00+00:00",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-main": "2.x-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Seld\\Signal\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Jordi Boggiano",
-                "email": "j.boggiano@seld.be",
-                "homepage": "http://seld.be"
-            }
-        ],
-        "description": "Simple unix signal handler that silently fails where signals are not supported for easy cross-platform development",
-        "keywords": [
-            "posix",
-            "sigint",
-            "signal",
-            "sigterm",
-            "unix"
-        ]
-    },
-    {
         "name": "symfony/console",
-        "version": "v6.3.4",
-        "version_normalized": "6.3.4.0",
+        "version": "v5.4.28",
+        "version_normalized": "5.4.28.0",
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/console.git",
-            "reference": "eca495f2ee845130855ddf1cf18460c38966c8b6"
+            "reference": "f4f71842f24c2023b91237c72a365306f3c58827"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/symfony/console/zipball/eca495f2ee845130855ddf1cf18460c38966c8b6",
-            "reference": "eca495f2ee845130855ddf1cf18460c38966c8b6",
+            "url": "https://api.github.com/repos/symfony/console/zipball/f4f71842f24c2023b91237c72a365306f3c58827",
+            "reference": "f4f71842f24c2023b91237c72a365306f3c58827",
             "shasum": ""
         },
         "require": {
-            "php": ">=8.1",
-            "symfony/deprecation-contracts": "^2.5|^3",
+            "php": ">=7.2.5",
+            "symfony/deprecation-contracts": "^2.1|^3",
             "symfony/polyfill-mbstring": "~1.0",
-            "symfony/service-contracts": "^2.5|^3",
-            "symfony/string": "^5.4|^6.0"
+            "symfony/polyfill-php73": "^1.9",
+            "symfony/polyfill-php80": "^1.16",
+            "symfony/service-contracts": "^1.1|^2|^3",
+            "symfony/string": "^5.1|^6.0"
         },
         "conflict": {
-            "symfony/dependency-injection": "<5.4",
-            "symfony/dotenv": "<5.4",
-            "symfony/event-dispatcher": "<5.4",
-            "symfony/lock": "<5.4",
-            "symfony/process": "<5.4"
+            "psr/log": ">=3",
+            "symfony/dependency-injection": "<4.4",
+            "symfony/dotenv": "<5.1",
+            "symfony/event-dispatcher": "<4.4",
+            "symfony/lock": "<4.4",
+            "symfony/process": "<4.4"
         },
         "provide": {
-            "psr/log-implementation": "1.0|2.0|3.0"
+            "psr/log-implementation": "1.0|2.0"
         },
         "require-dev": {
-            "psr/log": "^1|^2|^3",
-            "symfony/config": "^5.4|^6.0",
-            "symfony/dependency-injection": "^5.4|^6.0",
-            "symfony/event-dispatcher": "^5.4|^6.0",
-            "symfony/lock": "^5.4|^6.0",
-            "symfony/process": "^5.4|^6.0",
-            "symfony/var-dumper": "^5.4|^6.0"
+            "psr/log": "^1|^2",
+            "symfony/config": "^4.4|^5.0|^6.0",
+            "symfony/dependency-injection": "^4.4|^5.0|^6.0",
+            "symfony/event-dispatcher": "^4.4|^5.0|^6.0",
+            "symfony/lock": "^4.4|^5.0|^6.0",
+            "symfony/process": "^4.4|^5.0|^6.0",
+            "symfony/var-dumper": "^4.4|^5.0|^6.0"
         },
-        "time": "2023-08-16T10:10:12+00:00",
+        "suggest": {
+            "psr/log": "For using the console logger",
+            "symfony/event-dispatcher": "",
+            "symfony/lock": "",
+            "symfony/process": ""
+        },
+        "time": "2023-08-07T06:12:30+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -1104,25 +807,26 @@
     },
     {
         "name": "symfony/filesystem",
-        "version": "v6.3.1",
-        "version_normalized": "6.3.1.0",
+        "version": "v5.4.25",
+        "version_normalized": "5.4.25.0",
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/filesystem.git",
-            "reference": "edd36776956f2a6fcf577edb5b05eb0e3bdc52ae"
+            "reference": "0ce3a62c9579a53358d3a7eb6b3dfb79789a6364"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/symfony/filesystem/zipball/edd36776956f2a6fcf577edb5b05eb0e3bdc52ae",
-            "reference": "edd36776956f2a6fcf577edb5b05eb0e3bdc52ae",
+            "url": "https://api.github.com/repos/symfony/filesystem/zipball/0ce3a62c9579a53358d3a7eb6b3dfb79789a6364",
+            "reference": "0ce3a62c9579a53358d3a7eb6b3dfb79789a6364",
             "shasum": ""
         },
         "require": {
-            "php": ">=8.1",
+            "php": ">=7.2.5",
             "symfony/polyfill-ctype": "~1.8",
-            "symfony/polyfill-mbstring": "~1.8"
+            "symfony/polyfill-mbstring": "~1.8",
+            "symfony/polyfill-php80": "^1.16"
         },
-        "time": "2023-06-01T08:30:39+00:00",
+        "time": "2023-05-31T13:04:02+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -1152,26 +856,25 @@
     },
     {
         "name": "symfony/finder",
-        "version": "v6.3.3",
-        "version_normalized": "6.3.3.0",
+        "version": "v5.4.27",
+        "version_normalized": "5.4.27.0",
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/finder.git",
-            "reference": "9915db259f67d21eefee768c1abcf1cc61b1fc9e"
+            "reference": "ff4bce3c33451e7ec778070e45bd23f74214cd5d"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/symfony/finder/zipball/9915db259f67d21eefee768c1abcf1cc61b1fc9e",
-            "reference": "9915db259f67d21eefee768c1abcf1cc61b1fc9e",
+            "url": "https://api.github.com/repos/symfony/finder/zipball/ff4bce3c33451e7ec778070e45bd23f74214cd5d",
+            "reference": "ff4bce3c33451e7ec778070e45bd23f74214cd5d",
             "shasum": ""
         },
         "require": {
-            "php": ">=8.1"
+            "php": ">=7.2.5",
+            "symfony/deprecation-contracts": "^2.1|^3",
+            "symfony/polyfill-php80": "^1.16"
         },
-        "require-dev": {
-            "symfony/filesystem": "^6.0"
-        },
-        "time": "2023-07-31T08:31:44+00:00",
+        "time": "2023-07-31T08:02:31+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -1602,88 +1305,25 @@
         ]
     },
     {
-        "name": "symfony/polyfill-php81",
-        "version": "v1.28.0",
-        "version_normalized": "1.28.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/symfony/polyfill-php81.git",
-            "reference": "7581cd600fa9fd681b797d00b02f068e2f13263b"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/symfony/polyfill-php81/zipball/7581cd600fa9fd681b797d00b02f068e2f13263b",
-            "reference": "7581cd600fa9fd681b797d00b02f068e2f13263b",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=7.1"
-        },
-        "time": "2023-01-26T09:26:14+00:00",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-main": "1.28-dev"
-            },
-            "thanks": {
-                "name": "symfony/polyfill",
-                "url": "https://github.com/symfony/polyfill"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "files": [
-                "bootstrap.php"
-            ],
-            "psr-4": {
-                "Symfony\\Polyfill\\Php81\\": ""
-            },
-            "classmap": [
-                "Resources/stubs"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Nicolas Grekas",
-                "email": "p@tchwork.com"
-            },
-            {
-                "name": "Symfony Community",
-                "homepage": "https://symfony.com/contributors"
-            }
-        ],
-        "description": "Symfony polyfill backporting some PHP 8.1+ features to lower PHP versions",
-        "homepage": "https://symfony.com",
-        "keywords": [
-            "compatibility",
-            "polyfill",
-            "portable",
-            "shim"
-        ]
-    },
-    {
         "name": "symfony/process",
-        "version": "v6.3.4",
-        "version_normalized": "6.3.4.0",
+        "version": "v5.4.28",
+        "version_normalized": "5.4.28.0",
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/process.git",
-            "reference": "0b5c29118f2e980d455d2e34a5659f4579847c54"
+            "reference": "45261e1fccad1b5447a8d7a8e67aa7b4a9798b7b"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/symfony/process/zipball/0b5c29118f2e980d455d2e34a5659f4579847c54",
-            "reference": "0b5c29118f2e980d455d2e34a5659f4579847c54",
+            "url": "https://api.github.com/repos/symfony/process/zipball/45261e1fccad1b5447a8d7a8e67aa7b4a9798b7b",
+            "reference": "45261e1fccad1b5447a8d7a8e67aa7b4a9798b7b",
             "shasum": ""
         },
         "require": {
-            "php": ">=8.1"
+            "php": ">=7.2.5",
+            "symfony/polyfill-php80": "^1.16"
         },
-        "time": "2023-08-07T10:39:22+00:00",
+        "time": "2023-08-07T10:36:04+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -12,7 +12,6 @@
 
 namespace Composer\Package\Archiver;
 
-use Composer\Pcre\Preg;
 use Symfony\Component\Finder;
 
 /**
@@ -26,17 +25,17 @@ abstract class BaseExcludeFilter
     protected $sourcePath;
 
     /**
-     * @var array<array{0: non-empty-string, 1: bool, 2: bool}> array of [$pattern, $negate, $stripLeadingSlash] arrays
+     * @var array
      */
     protected $excludePatterns;
 
     /**
      * @param string $sourcePath Directory containing sources to be filtered
      */
-    public function __construct(string $sourcePath)
+    public function __construct($sourcePath)
     {
         $this->sourcePath = $sourcePath;
-        $this->excludePatterns = [];
+        $this->excludePatterns = array();
     }
 
     /**
@@ -45,14 +44,14 @@ abstract class BaseExcludeFilter
      * Negated patterns overwrite exclude decisions of previous filters.
      *
      * @param string $relativePath The file's path relative to the sourcePath
-     * @param bool $exclude Whether a previous filter wants to exclude this file
+     * @param bool   $exclude      Whether a previous filter wants to exclude this file
      *
      * @return bool Whether the file should be excluded
      */
-    public function filter(string $relativePath, bool $exclude): bool
+    public function filter($relativePath, $exclude)
     {
         foreach ($this->excludePatterns as $patternData) {
-            [$pattern, $negate, $stripLeadingSlash] = $patternData;
+            list($pattern, $negate, $stripLeadingSlash) = $patternData;
 
             if ($stripLeadingSlash) {
                 $path = substr($relativePath, 1);
@@ -60,12 +59,8 @@ abstract class BaseExcludeFilter
                 $path = $relativePath;
             }
 
-            try {
-                if (Preg::isMatch($pattern, $path)) {
-                    $exclude = !$negate;
-                }
-            } catch (\RuntimeException $e) {
-                // suppressed
+            if (@preg_match($pattern, $path)) {
+                $exclude = !$negate;
             }
         }
 
@@ -75,27 +70,27 @@ abstract class BaseExcludeFilter
     /**
      * Processes a file containing exclude rules of different formats per line
      *
-     * @param string[] $lines A set of lines to be parsed
+     * @param array    $lines      A set of lines to be parsed
      * @param callable $lineParser The parser to be used on each line
      *
-     * @return array<array{0: non-empty-string, 1: bool, 2: bool}> Exclude patterns to be used in filter()
+     * @return array Exclude patterns to be used in filter()
      */
-    protected function parseLines(array $lines, callable $lineParser): array
+    protected function parseLines(array $lines, $lineParser)
     {
         return array_filter(
             array_map(
-                static function ($line) use ($lineParser) {
+                function ($line) use ($lineParser) {
                     $line = trim($line);
 
                     if (!$line || 0 === strpos($line, '#')) {
                         return null;
                     }
 
-                    return $lineParser($line);
+                    return call_user_func($lineParser, $line);
                 },
                 $lines
             ),
-            static function ($pattern): bool {
+            function ($pattern) {
                 return $pattern !== null;
             }
         );
@@ -104,13 +99,13 @@ abstract class BaseExcludeFilter
     /**
      * Generates a set of exclude patterns for filter() from gitignore rules
      *
-     * @param string[] $rules A list of exclude rules in gitignore syntax
+     * @param array $rules A list of exclude rules in gitignore syntax
      *
-     * @return array<int, array{0: non-empty-string, 1: bool, 2: bool}> Exclude patterns
+     * @return array Exclude patterns
      */
-    protected function generatePatterns(array $rules): array
+    protected function generatePatterns($rules)
     {
-        $patterns = [];
+        $patterns = array();
         foreach ($rules as $rule) {
             $patterns[] = $this->generatePattern($rule);
         }
@@ -123,30 +118,31 @@ abstract class BaseExcludeFilter
      *
      * @param string $rule An exclude rule in gitignore syntax
      *
-     * @return array{0: non-empty-string, 1: bool, 2: bool} An exclude pattern
+     * @return array An exclude pattern
      */
-    protected function generatePattern(string $rule): array
+    protected function generatePattern($rule)
     {
         $negate = false;
-        $pattern = '';
+        $pattern = '{';
 
-        if ($rule !== '' && $rule[0] === '!') {
+        if (strlen($rule) && $rule[0] === '!') {
             $negate = true;
-            $rule = ltrim($rule, '!');
+            $rule = substr($rule, 1);
         }
 
-        $firstSlashPosition = strpos($rule, '/');
-        if (0 === $firstSlashPosition) {
-            $pattern = '^/';
-        } elseif (false === $firstSlashPosition || strlen($rule) - 1 === $firstSlashPosition) {
-            $pattern = '/';
+        if (strlen($rule) && $rule[0] === '/') {
+            $pattern .= '^/';
+            $rule = substr($rule, 1);
+        } elseif (strlen($rule) - 1 === strpos($rule, '/')) {
+            $pattern .= '/';
+            $rule = substr($rule, 0, -1);
+        } elseif (false === strpos($rule, '/')) {
+            $pattern .= '/';
         }
-
-        $rule = trim($rule, '/');
 
         // remove delimiters as well as caret (^) and dollar sign ($) from the regex
-        $rule = substr(Finder\Glob::toRegex($rule), 2, -2);
+        $pattern .= substr(Finder\Glob::toRegex($rule), 2, -2) . '(?=$|/)';
 
-        return ['{'.$pattern.$rule.'(?=$|/)}', $negate, false];
+        return array($pattern . '}', $negate, false);
     }
 }

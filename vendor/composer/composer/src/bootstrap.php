@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -10,11 +10,9 @@
  * file that was distributed with this source code.
  */
 
-use Composer\Autoload\ClassLoader;
-
-function includeIfExists(string $file): ?ClassLoader
+function includeIfExists($file)
 {
-    return file_exists($file) ? include $file : null;
+    return file_exists($file) ? include $file : false;
 }
 
 if ((!$loader = includeIfExists(__DIR__.'/../vendor/autoload.php')) && (!$loader = includeIfExists(__DIR__.'/../../../autoload.php'))) {

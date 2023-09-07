@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of Composer.
@@ -13,10 +13,19 @@
 namespace Composer\Installer;
 
 use Composer\Composer;
-use Composer\DependencyResolver\Transaction;
+use Composer\DependencyResolver\PolicyInterface;
+use Composer\DependencyResolver\Operation\OperationInterface;
+use Composer\DependencyResolver\Pool;
+use Composer\DependencyResolver\Request;
 use Composer\EventDispatcher\Event;
 use Composer\IO\IOInterface;
+use Composer\Repository\CompositeRepository;
 
+/**
+ * An event for all installer.
+ *
+ * @author François Pluchino <francois.pluchino@gmail.com>
+ */
 class InstallerEvent extends Event
 {
     /**
@@ -35,51 +44,118 @@ class InstallerEvent extends Event
     private $devMode;
 
     /**
-     * @var bool
+     * @var PolicyInterface
      */
-    private $executeOperations;
+    private $policy;
 
     /**
-     * @var Transaction
+     * @var Pool
      */
-    private $transaction;
+    private $pool;
+
+    /**
+     * @var CompositeRepository
+     */
+    private $installedRepo;
+
+    /**
+     * @var Request
+     */
+    private $request;
+
+    /**
+     * @var OperationInterface[]
+     */
+    private $operations;
 
     /**
      * Constructor.
+     *
+     * @param string               $eventName
+     * @param Composer             $composer
+     * @param IOInterface          $io
+     * @param bool                 $devMode
+     * @param PolicyInterface      $policy
+     * @param Pool                 $pool
+     * @param CompositeRepository  $installedRepo
+     * @param Request              $request
+     * @param OperationInterface[] $operations
      */
-    public function __construct(string $eventName, Composer $composer, IOInterface $io, bool $devMode, bool $executeOperations, Transaction $transaction)
+    public function __construct($eventName, Composer $composer, IOInterface $io, $devMode, PolicyInterface $policy, Pool $pool, CompositeRepository $installedRepo, Request $request, array $operations = array())
     {
         parent::__construct($eventName);
 
         $this->composer = $composer;
         $this->io = $io;
         $this->devMode = $devMode;
-        $this->executeOperations = $executeOperations;
-        $this->transaction = $transaction;
+        $this->policy = $policy;
+        $this->pool = $pool;
+        $this->installedRepo = $installedRepo;
+        $this->request = $request;
+        $this->operations = $operations;
     }
 
-    public function getComposer(): Composer
+    /**
+     * @return Composer
+     */
+    public function getComposer()
     {
         return $this->composer;
     }
 
-    public function getIO(): IOInterface
+    /**
+     * @return IOInterface
+     */
+    public function getIO()
     {
         return $this->io;
     }
 
-    public function isDevMode(): bool
+    /**
+     * @return bool
+     */
+    public function isDevMode()
     {
         return $this->devMode;
     }
 
-    public function isExecutingOperations(): bool
+    /**
+     * @return PolicyInterface
+     */
+    public function getPolicy()
     {
-        return $this->executeOperations;
+        return $this->policy;
     }
 
-    public function getTransaction(): ?Transaction
+    /**
+     * @return Pool
+     */
+    public function getPool()
     {
-        return $this->transaction;
+        return $this->pool;
+    }
+
+    /**
+     * @return CompositeRepository
+     */
+    public function getInstalledRepo()
+    {
+        return $this->installedRepo;
+    }
+
+    /**
+     * @return Request
+     */
+    public function getRequest()
+    {
+        return $this->request;
+    }
+
+    /**
+     * @return OperationInterface[]
+     */
+    public function getOperations()
+    {
+        return $this->operations;
     }
 }
