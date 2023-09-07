@@ -1,7 +1,7 @@
 {
   "name": "jphayek/plugin-package",
   "require": {
-    "php": "8.2.6",
+    "php": "^8.2.6",
     "composer/composer": "^2.0",
     "monolog/monolog": "^2.0"
 }
