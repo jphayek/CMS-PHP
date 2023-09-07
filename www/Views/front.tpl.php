@@ -37,6 +37,10 @@
           </ul>  
 
           <ul class="nav navbar-nav navbar-right">
+          <?php
+            $currentUrl = $_SERVER['REQUEST_URI'];
+            $isLoginPage = strpos($currentUrl, '/login') !== false;
+          ?>
             <?php if (!isset($_SESSION['user_id'])) : ?>
                 <!-- Afficher les liens "Login" et "Register" uniquement si l'utilisateur n'est pas connecté -->
                 <li><a href="/login">Login</a></li>
@@ -47,24 +51,26 @@
             <?php endif; ?>
           </ul>
          
-        </div><!--/.nav-collapse -->
+        </div>
       </div>
     </div>
     <!-- inclure la vue -->
     <div class="container">
       <!-- Affichage de la liste des catégories -->
-      
-      <label for="category_id">Category:</label>
+      <?php if (!$isLoginPage): ?>
+      <div class="filter">
+        <label for="category_id">Category:</label>
 
-        <select id="category_id" class="form-select" required>
-          <option value="0">All Articles</option>
-          <option value="1">SPORT</option>
-          <option value="2">BLOG</option>
-          <option value="3">OTHER</option>
-        
-        </select>
-
-    <!-- Div ou tout autre élément où vous afficherez les articles filtrés -->
+          <select id="category_id" class="form-select" required>
+            <option value="0">All Articles</option>
+            <option value="1">SPORT</option>
+            <option value="2">BLOG</option>
+            <option value="3">OTHER</option>
+          
+          </select>
+            </div>
+          <?php endif; ?>
+    
     <div id="filteredArticles">
         <!-- Le contenu des articles filtrés sera affiché ici -->
 
@@ -89,7 +95,7 @@
             //alert(selectedCategoryId);
             $.ajax({
               method: 'GET',
-              url: '/getArticlesByCategory?category_id='+selectedCategoryId, // Remplacez 1 par l'ID de la catégorie souhaitée
+              url: '/getArticlesByCategory?category_id='+selectedCategoryId, 
               success: function (data) {
                   // Mettez à jour le contenu de l'élément avec les articles filtrés
                   filteredArticles.html(data);
