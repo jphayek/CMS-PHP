@@ -57,11 +57,13 @@
     <!-- inclure la vue -->
     <div class="container">
       <!-- Affichage de la liste des catégories -->
-      <?php if (!$isLoginPage): ?>
+      <?php
+        if (!in_array($_SERVER['REQUEST_URI'], ['/login', '/register'])) {
+      ?>
       <div class="filter">
-        <label for="category_id">Category:</label>
+        <label for="category_id">Filtrer par Category:</label>
 
-          <select id="category_id" class="form-select" required>
+          <select id="category_id" class="form-control" required>
             <option value="0">All Articles</option>
             <option value="1">SPORT</option>
             <option value="2">BLOG</option>
@@ -69,7 +71,9 @@
           
           </select>
             </div>
-          <?php endif; ?>
+            <?php
+}
+?>
     
     <div id="filteredArticles">
         <!-- Le contenu des articles filtrés sera affiché ici -->
