@@ -5,6 +5,7 @@
     "composer-plugin-api": "^1.0"
 },
 "require-dev": {
-  "heroku/heroku-buildpack-php": "*"
+  "heroku/heroku-buildpack-php": "*",
+  "composer/composer": "^2.0"
 }
 }
