@@ -48,6 +48,10 @@ class ComposerStaticInit62d2a4dc9964174cad1388c9f020b928
             'Psr\\Log\\' => 8,
             'Psr\\Container\\' => 14,
         ),
+        'M' => 
+        array (
+            'Monolog\\' => 8,
+        ),
         'J' => 
         array (
             'JsonSchema\\' => 11,
@@ -141,6 +145,10 @@ class ComposerStaticInit62d2a4dc9964174cad1388c9f020b928
         'Psr\\Container\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/container/src',
+        ),
+        'Monolog\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/monolog/monolog/src/Monolog',
         ),
         'JsonSchema\\' => 
         array (
