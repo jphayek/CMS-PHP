@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * This file is part of Composer.
@@ -21,6 +21,7 @@ use Composer\IO\IOInterface;
  */
 class ErrorHandler
 {
+    /** @var ?IOInterface */
     private static $io;
 
     /**
@@ -33,13 +34,14 @@ class ErrorHandler
      *
      * @static
      * @throws \ErrorException
-     * @return bool
      */
-    public static function handle($level, $message, $file, $line)
+    public static function handle(int $level, string $message, string $file, int $line): bool
     {
+        $isDeprecationNotice = $level === E_DEPRECATED || $level === E_USER_DEPRECATED;
+
         // error code is not included in error_reporting
-        if (!(error_reporting() & $level)) {
-            return;
+        if (!$isDeprecationNotice && !(error_reporting() & $level)) {
+            return true;
         }
 
         if (filter_var(ini_get('xdebug.scream'), FILTER_VALIDATE_BOOLEAN)) {
@@ -47,24 +49,15 @@ class ErrorHandler
             "\na legitimately suppressed error that you were not supposed to see.";
         }
 
-        if ($level !== E_DEPRECATED && $level !== E_USER_DEPRECATED) {
+        if (!$isDeprecationNotice) {
             throw new \ErrorException($message, 0, $level, $file, $line);
         }
 
         if (self::$io) {
-            // ignore symfony/* deprecation warnings about return types
-            // also ignore them from the Composer namespace, as 1.x won't get all that fixed anymore
-            if (preg_match('{^Return type of (Symfony|Composer)\\\\.*ReturnTypeWillChange}is', $message)) {
-                return true;
-            }
-            if (strpos(strtr($file, '\\', '/'), 'vendor/symfony/') !== false) {
-                return true;
-            }
-
             self::$io->writeError('<warning>Deprecation Notice: '.$message.' in '.$file.':'.$line.'</warning>');
             if (self::$io->isVerbose()) {
                 self::$io->writeError('<warning>Stack trace:</warning>');
-                self::$io->writeError(array_filter(array_map(function ($a) {
+                self::$io->writeError(array_filter(array_map(static function ($a): ?string {
                     if (isset($a['line'], $a['file'])) {
                         return '<warning> '.$a['file'].':'.$a['line'].'</warning>';
                     }
@@ -79,12 +72,10 @@ class ErrorHandler
 
     /**
      * Register error handler.
-     *
-     * @param IOInterface|null $io
      */
-    public static function register(IOInterface $io = null)
+    public static function register(?IOInterface $io = null): void
     {
-        set_error_handler(array(__CLASS__, 'handle'));
+        set_error_handler([__CLASS__, 'handle']);
         error_reporting(E_ALL | E_STRICT);
         self::$io = $io;
     }
