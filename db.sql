@@ -1,5 +1,97 @@
 -- Adminer 4.8.1 PostgreSQL 15.2 (Debian 15.2-1.pgdg110+1) dump
 
+DROP TABLE IF EXISTS "categories";
+DROP SEQUENCE IF EXISTS categories_id_seq;
+CREATE SEQUENCE categories_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."categories" (
+    "id" integer DEFAULT nextval('categories_id_seq') NOT NULL,
+    "name" character varying(255) NOT NULL,
+    CONSTRAINT "categories_pkey" PRIMARY KEY ("id")
+) WITH (oids = false);
+
+
+DROP TABLE IF EXISTS "esgi_article";
+DROP SEQUENCE IF EXISTS article_id_seq;
+CREATE SEQUENCE article_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."esgi_article" (
+    "id" integer DEFAULT nextval('article_id_seq') NOT NULL,
+    "title" character varying(255) NOT NULL,
+    "content" text NOT NULL,
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp,
+    "author" integer NOT NULL,
+    "category_id" integer NOT NULL,
+    CONSTRAINT "article_pkey" PRIMARY KEY ("id")
+) WITH (oids = false);
+
+INSERT INTO "esgi_article" ("id", "title", "content", "created_at", "updated_at", "author", "category_id") VALUES
+(1,	'Test',	'Article1',	'2023-06-29 07:43:22.489591',	NULL,	0,	1),
+(2,	'Qwrqwr',	'qwrqwr',	'2023-08-02 19:00:00.654245',	NULL,	4,	2),
+(30,	'Tet',	'tet',	'2023-09-03 14:34:28.492794',	NULL,	4,	3),
+(9,	'Uu',	'uu',	'2023-06-30 12:40:12.036204',	NULL,	5,	2),
+(3,	'Js',	'JavaScript',	'2023-06-29 07:43:22.489591',	NULL,	0,	3),
+(37,	'Title',	'content',	'2023-09-03 14:38:53.329486',	NULL,	4,	1),
+(8,	'Rr',	'rr',	'2023-06-30 12:36:34.583679',	NULL,	5,	1),
+(101,	'Tqt',	'tesss',	'2023-09-03 16:22:13.496648',	NULL,	4,	1),
+(102,	'Qwrq',	'qwrq',	'2023-09-03 16:22:16.54114',	NULL,	4,	1),
+(104,	'Test',	'TTTTTTTTTTTTTTT',	'2023-09-03 16:22:57.3725',	NULL,	4,	1),
+(105,	'Test',	'TESTTTTTTTTTTT',	'2023-09-03 16:23:06.599716',	NULL,	4,	1),
+(106,	'Test',	'TESTTTTTTTTTTT',	'2023-09-03 16:24:05.990339',	NULL,	4,	1),
+(107,	'Qqqqqqqqqqqqqq',	'qqqqqqqqqqqqqqqqq',	'2023-09-03 16:24:10.356958',	NULL,	4,	1),
+(108,	'Qqqqqqqqqqqqqq',	'qqqqqqqqqqqqqqqqq',	'2023-09-03 16:25:20.076661',	NULL,	4,	1),
+(109,	'Un Test',	'test',	'2023-09-03 16:51:53.939158',	NULL,	4,	1),
+(110,	'Article',	'article',	'2023-09-03 16:52:21.619536',	NULL,	4,	1),
+(111,	'Testt',	'tetst',	'2023-09-05 20:16:52.874659',	NULL,	4,	1),
+(22,	'Title',	'Content',	'2023-09-03 14:28:21.133896',	NULL,	4,	1),
+(28,	'Tet',	'tet',	'2023-09-03 14:33:32.262598',	NULL,	4,	1),
+(33,	'Title',	'tet',	'2023-09-03 14:34:58.480321',	NULL,	4,	1),
+(34,	'Title Test',	'Content test',	'2023-09-03 14:36:46.716196',	NULL,	4,	1),
+(35,	'Title Test',	'Content test',	'2023-09-03 14:37:56.324241',	NULL,	4,	1),
+(36,	'Title Test',	'Content test',	'2023-09-03 14:38:44.723826',	NULL,	4,	1),
+(38,	'Title',	'content',	'2023-09-03 14:40:44.935259',	NULL,	4,	1),
+(39,	'Title',	'Content',	'2023-09-03 14:40:54.506701',	NULL,	4,	1),
+(40,	'Title',	'Content',	'2023-09-03 14:41:30.368703',	NULL,	4,	1),
+(112,	'Sport',	'sport',	'2023-09-05 21:15:12.350686',	NULL,	4,	1),
+(113,	'Blog',	'blog',	'2023-09-05 21:16:00.686448',	NULL,	4,	2),
+(114,	'Other',	'other',	'2023-09-05 21:16:24.860049',	NULL,	4,	3),
+(115,	'Sport1',	'Sport1',	'2023-09-05 23:17:50.058299',	NULL,	4,	1);
+
+DROP TABLE IF EXISTS "esgi_comment";
+DROP SEQUENCE IF EXISTS esgi_comment_id_seq;
+CREATE SEQUENCE esgi_comment_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."esgi_comment" (
+    "id" integer DEFAULT nextval('esgi_comment_id_seq') NOT NULL,
+    "article_id" integer NOT NULL,
+    "user_id" integer NOT NULL,
+    "content" text,
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "moderated" integer DEFAULT '0',
+    "flagged" integer DEFAULT '0',
+    "flagged_count" integer DEFAULT '0',
+    CONSTRAINT "esgi_comment_pkey" PRIMARY KEY ("id")
+) WITH (oids = false);
+
+
+DROP TABLE IF EXISTS "esgi_pages";
+DROP SEQUENCE IF EXISTS pages_id_seq;
+CREATE SEQUENCE pages_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
+
+CREATE TABLE "public"."esgi_pages" (
+    "id" integer DEFAULT nextval('pages_id_seq') NOT NULL,
+    "title" character varying(255) NOT NULL,
+    "content" text NOT NULL,
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp,
+    "created_by" integer NOT NULL,
+    "slug" character varying(255),
+    "status" integer DEFAULT '0' NOT NULL,
+    CONSTRAINT "pages_pkey" PRIMARY KEY ("id")
+) WITH (oids = false);
+
+
 DROP TABLE IF EXISTS "esgi_user";
 DROP SEQUENCE IF EXISTS esgi_user_id_seq;
 CREATE SEQUENCE esgi_user_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
@@ -19,120 +111,12 @@ CREATE TABLE "public"."esgi_user" (
     CONSTRAINT "esgi_user_pkey" PRIMARY KEY ("id")
 ) WITH (oids = false);
 
-INSERT INTO "esgi_user" ("id", "firstname", "lastname", "email", "pwd", "country", "status", "date_inserted", "date_updated", "role", "verificationtoken") VALUES
-(1,	'Jean-paul',	'HAYEK',	'jphayek@user.com',	'$2y$10$jDveAzEtjzitGlyEj/d0gu8FlGnFwQrM9f2SyAWsEhXhwb/uZN56W',	NULL,	0,	NULL,	NULL,	'user',	'fcb68109d992fa156e377006aa3931cd9fd54b6b53d61db8d5538b0a6294cbe9934ab50fe0577b4fd0e193a0f47209a855e7'),
-(2,	'Test',	'USER',	'test@user.com',	'$2y$10$RFkilW6oFze3u9eNY7RLxeCYxm4/biazvyrucs0u9czPAC7HnxlRS',	NULL,	1,	NULL,	NULL,	'user',	'c09a4ed9d53ca2291839fa1776e12d31ba6e617c554b8cee74016469f4b0c826d4a3d0a616ee451212d1c5a2160980f51731'),
-(3,	'Jean-paul',	'HAYEK',	'jphayek@myges.fr',	'$2y$10$9w16xcdZftf0ccGQR1s6aOvHM8Dke0oKFwqKBTW.xOb9JNnIeYYrm',	NULL,	0,	NULL,	NULL,	'admin',	'8d9de25d4a7627d69bbb644ff97649da58422d0520cb1210546a26faef191dc8410eb4444f25d5a73354c04410f53efb443d');
--- 2023-06-28 09:53:25.240648+00
 
+ALTER TABLE ONLY "public"."esgi_article" ADD CONSTRAINT "esgi_article_category_id_fkey" FOREIGN KEY (category_id) REFERENCES categories(id) NOT DEFERRABLE;
 
-
--- Adminer 4.8.1 PostgreSQL 15.2 (Debian 15.2-1.pgdg110+1) dump
-
-DROP TABLE IF EXISTS "esgi_article";
-DROP SEQUENCE IF EXISTS article_id_seq;
-CREATE SEQUENCE article_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
-CREATE TABLE "public"."esgi_article" (
-    "id" integer DEFAULT nextval('article_id_seq') NOT NULL,
-    "title" character varying(255) NOT NULL,
-    "content" text NOT NULL,
-    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp,
-    "author" integer NOT NULL,
-    CONSTRAINT "article_pkey" PRIMARY KEY ("id")
-) WITH (oids = false);
-
-INSERT INTO "esgi_article" ("id", "title", "content", "created_at", "updated_at", "author") VALUES
-(1,	'Test',	'Article1',	'2023-06-29 07:43:22.489591',	NULL,	0),
-(3,	'Js',	'JavaScript',	'2023-06-29 07:43:22.489591',	NULL,	0),
-(8,	'Rr',	'rr',	'2023-06-30 12:36:34.583679',	NULL,	5),
-(9,	'Uu',	'uu',	'2023-06-30 12:40:12.036204',	NULL,	5);
-
--- 2023-06-30 12:47:39.586761+00
-
-
-DROP TABLE IF EXISTS "esgi_pages";
-DROP SEQUENCE IF EXISTS pages_id_seq;
-CREATE SEQUENCE pages_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
-/*CREATE TABLE "public"."esgi_pages" (
-    "id" integer DEFAULT nextval('pages_id_seq') NOT NULL,
-    "title" character varying(255) NOT NULL,
-    "content" text NOT NULL,
-    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp,
-    CONSTRAINT "pages_pkey" PRIMARY KEY ("id")
-
-) WITH (oids = false);4
-
-) WITH (oids = false);*/
-
-
-DROP TABLE IF EXISTS "esgi_comment";
-DROP SEQUENCE IF EXISTS comment_id_seq;
-CREATE SEQUENCE comment_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
-CREATE TABLE esgi_comment (
-  id SERIAL PRIMARY KEY,
-  article_id INT NOT NULL,
-  user_id INT NOT NULL,
-  content TEXT,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  moderated INT DEFAULT 0,
-  flagged INT DEFAULT 0,
-  flagged_count INT DEFAULT 0,
-  FOREIGN KEY (article_id) REFERENCES esgi_article(id),
-  FOREIGN KEY (user_id) REFERENCES esgi_user(id)
-);
-
-
-DROP TABLE IF EXISTS "esgi_pages";
-DROP SEQUENCE IF EXISTS pages_id_seq;
-
-CREATE SEQUENCE pages_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1;
-
-CREATE TABLE "public"."esgi_pages" (
-    "id" integer DEFAULT nextval('pages_id_seq') NOT NULL,
-    "title" character varying(255) NOT NULL,
-    "content" text NOT NULL,
-    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp,
-    "created_by" integer NOT NULL,
-    "slug" character varying(255),
-    "status" integer DEFAULT 0 NOT NULL,
-    CONSTRAINT "pages_pkey" PRIMARY KEY ("id")
-) WITH (oids = false);
-
-
-
+ALTER TABLE ONLY "public"."esgi_comment" ADD CONSTRAINT "esgi_comment_article_id_fkey" FOREIGN KEY (article_id) REFERENCES esgi_article(id) NOT DEFERRABLE;
+ALTER TABLE ONLY "public"."esgi_comment" ADD CONSTRAINT "esgi_comment_user_id_fkey" FOREIGN KEY (user_id) REFERENCES esgi_user(id) NOT DEFERRABLE;
 
 ALTER TABLE ONLY "public"."esgi_pages" ADD CONSTRAINT "fk_page_created_by" FOREIGN KEY (created_by) REFERENCES esgi_user(id) ON DELETE CASCADE NOT DEFERRABLE;
 
-CREATE TABLE "public"."categories" (
-    "id" serial PRIMARY KEY,
-    "name" character varying(255) NOT NULL
-);
-CREATE TABLE article_category (
-    article_id integer REFERENCES esgi_article(id),
-    category_id integer REFERENCES categories(id),
-    PRIMARY KEY (article_id, category_id)
-);
-
--- Insérer la catégorie "Sport"
-INSERT INTO categories (name) VALUES ('Sport');
-
--- Insérer la catégorie "Blog"
-INSERT INTO categories (name) VALUES ('Blog');
-
--- Insérer la catégorie "Other"
-INSERT INTO categories (name) VALUES ('Other')
-
--- Associer un article à la catégorie "Sport"
-INSERT INTO article_category (article_id, category_id) VALUES (1, (SELECT id FROM categories WHERE name = 'Sport'));
-
--- Associer un article à la catégorie "Blog"
-INSERT INTO article_category (article_id, category_id) VALUES (2, (SELECT id FROM categories WHERE name = 'Blog'));
-
--- Associer un article à la catégorie "Other"
-INSERT INTO article_category (article_id, category_id) VALUES (3, (SELECT id FROM categories WHERE name = 'Other'));
+-- 2023-09-08 22:24:26.408069+00
