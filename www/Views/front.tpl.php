@@ -24,6 +24,10 @@
           <ul class="nav navbar-nav">
           
             <li class="active"><a href="/">Home</a></li>
+            
+            <li><a href="/pages/toutes-les-pages">Toutes les Pages</a></li>
+
+
             <?php if (isset($pages) && is_array($pages)) : ?>
             <?php foreach ($pages as $page) : ?>
               <li><a href="/pages/<?= $page->getSlug(); ?>"><?= $page->getTitle(); ?></a></li>
@@ -58,7 +62,7 @@
     <div class="container">
       <!-- Affichage de la liste des catégories -->
       <?php
-        if (!in_array($_SERVER['REQUEST_URI'], ['/login', '/register'])) {
+        if (!in_array($_SERVER['REQUEST_URI'], ['/login', '/register', '/pages/toutes-les-pages'])) {
       ?>
       <div class="filter">
         <label for="category_id">Filtrer par Category:</label>
