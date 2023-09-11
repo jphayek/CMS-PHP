@@ -87,6 +87,11 @@ pages/delete:
     controller: Pages
     action: delete
 
+pages/toutes-les-pages:
+    controller: Pages
+    action: toutesLesPages
+
+
 comments:
     controller: Comment
     action: read

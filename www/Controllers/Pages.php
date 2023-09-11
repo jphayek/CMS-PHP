@@ -212,7 +212,15 @@ public function show(): void
 
 //show page
 
+public function toutesLesPages()
+{
+    $pagesModel = new PagesModel();
+    $allPages = $pagesModel->getAll(); // Récupérez toutes les pages
 
+    $view = new View("Pages/toutes-les-pages", "front");
+    $view->assign("pages", $allPages); // Utilisez le nom de variable "pages" ici, pas "page"
+    $view->render();
+}
 
 
 
