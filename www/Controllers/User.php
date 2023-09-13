@@ -6,6 +6,7 @@ use App\datatable\userTable;
 use App\Forms\CreateUserForm;
 use App\Forms\UpdateUserForm;
 use App\Forms\DeleteUserForm;
+use App\Forms\EditUserForm;
 use App\Models\User as UserModel;
 use App\Forms\UserForm;
 
@@ -108,6 +109,46 @@ class User {
         // Redirige vers une autre page, par exemple, la liste des utilisateurs
         header('Location: /users');
     }
+
+    public function editProfile($params):void
+{
+    if (!isset($_SESSION['user_id'])) {
+        header('Location: /login'); 
+        exit();
+    }
+
+  
+    $userId = $_SESSION['user_id'];
+
+   
+    $userModel = new UserModel();
+    $user = $userModel->getOneWhere(["id" => $userId]);
+
+    if (!$user) {
+        throw new \Exception('User not found');
+    }
+
+    $form = new EditUserForm();
+
+    $view = new View("User/editProfile", "front");
+    $view->assign("form", $form->getConfig($user));
+    $view->assign("formErrors", $form->errors);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+        $user->setFirstname($_POST['firstname']);
+        $user->setLastname($_POST['lastname']);
+        $user->setEmail($_POST['email']);
+
+       
+        if (!empty($_POST['password'])) {
+            $user->setPwd(password_hash($_POST['password'], PASSWORD_BCRYPT));
+        }
+        
+        $user->save();
+        header('Location: /'); 
+        exit();
+    }
+}
     
 
     

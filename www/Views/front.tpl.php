@@ -29,7 +29,9 @@
               <li><a href="/pages/<?= $page->getSlug(); ?>"><?= $page->getTitle(); ?></a></li>
               <?php endforeach; ?>
             <?php endif; ?>
+              
           
+
             <?php if (isset($_SESSION['user_id']) && $_SESSION['role'] === 'admin'): ?>
                 <li><a href="/dashboard">Dashboard</a></li>
             <?php endif; ?> 
@@ -37,6 +39,9 @@
           </ul>  
 
           <ul class="nav navbar-nav navbar-right">
+            <?php if (isset($_SESSION['user_id'])) : ?>
+              <li><a href="/user/profile/edit">Modifier le profil</a></li>
+            <?php endif; ?>
           <?php
             $currentUrl = $_SERVER['REQUEST_URI'];
             $isLoginPage = strpos($currentUrl, '/login') !== false;
@@ -58,7 +63,7 @@
     <div class="container">
       <!-- Affichage de la liste des catégories -->
       <?php
-        if (!in_array($_SERVER['REQUEST_URI'], ['/login', '/register'])) {
+        if (!in_array($_SERVER['REQUEST_URI'], ['/login', '/register', '/user/profile/edit'])) {
       ?>
       <div class="filter">
         <label for="category_id">Filtrer par Category:</label>
