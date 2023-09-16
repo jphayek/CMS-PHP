@@ -44,15 +44,18 @@ class Article{
     
         if ($form->isSubmitted() && $form->isValid()) {
             $article = new ArticleModel();
-            $article->setTitle($_POST['title']);
-            $article->setContent($_POST['content']);
+            // Nettoyez le titre et le contenu en utilisant htmlspecialchars
+            $title = htmlspecialchars($_POST['title'], ENT_QUOTES, 'UTF-8');
+            $content = htmlspecialchars($_POST['content'], ENT_QUOTES, 'UTF-8');
+            $article->setTitle($title);
+            $article->setContent($content);
             $article->setAuthor($_SESSION['user_id']);
             $article->setCategoryId($_POST['category_id']);
             $article->save();
 
             // Récupérez l'ID de la catégorie sélectionnée depuis le formulaire
             $categoryId = $_POST['category_id'];
-            //var_dump($_POST['category_id']);
+            
             $article->associateCategory($categoryId);
 
             header('Location: /articles');

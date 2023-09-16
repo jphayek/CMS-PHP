@@ -68,7 +68,7 @@
     <div class="container">
       <!-- Affichage de la liste des catégories -->
       <?php
-        if (!in_array($_SERVER['REQUEST_URI'], ['/login', '/register', '/user/profile/edit', '/pages/toutes-les-pages', '/pages/{slug}'])) {
+        if ($_SERVER['REQUEST_URI'] === '/'){
       ?>
       <div class="filter">
         <label for="category_id">Filtrer par Category:</label>

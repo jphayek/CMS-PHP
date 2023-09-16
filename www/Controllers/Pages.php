@@ -46,23 +46,20 @@ class Pages {
 
         if($form->isSubmitted() && $form->isValid()){
             $pages = new PagesModel();
-            $pages->setTitle($_POST['title']);
-            $pages->setContent($_POST['content']);
+            $pages->setTitle(htmlspecialchars($_POST['title'], ENT_QUOTES, 'UTF-8'));
+            $pages->setContent(htmlspecialchars($_POST['content'], ENT_QUOTES, 'UTF-8'));
             $pages->setCreated_by($_SESSION['user_id']); // Définir l'ID de l'utilisateur qui a créé la page
-            $pages->setSlug($_POST['slug']);
+            $pages->setSlug(htmlspecialchars($_POST['slug'], ENT_QUOTES, 'UTF-8'));
             $pages->setStatus(0); 
             $pages->save();
-
         
-
-        
-         header('Location: /pages');
+            header('Location: /pages');
             exit;
-        }
 
         // Afficher la vue du formulaire de création
         $view->render();
     }
+}
 
   
 

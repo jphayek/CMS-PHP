@@ -76,14 +76,20 @@ class Auth
         $view->assign("form", $form->getConfig());
 
         //Form validé ? et correct ?
-        if($form->isSubmitted() && $form->isValid()){
+        if ($form->isSubmitted() && $form->isValid()) {
             $user = new User();
-            $user->setFirstname($_POST['firstname']);
-            $user->setLastname($_POST['lastname']);
-            $user->setEmail($_POST['email']);
-            $user->setPwd($_POST['pwd']);
-            $user->setStatus(0); // Or another default value
-            $user->setRole("user"); // Or another default value
+            // Nettoyez les données en utilisant htmlspecialchars
+            $firstname = htmlspecialchars($_POST['firstname'], ENT_QUOTES, 'UTF-8');
+            $lastname = htmlspecialchars($_POST['lastname'], ENT_QUOTES, 'UTF-8');
+            $email = htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8');
+            $pwd = htmlspecialchars($_POST['pwd'], ENT_QUOTES, 'UTF-8');
+            
+            $user->setFirstname($firstname);
+            $user->setLastname($lastname);
+            $user->setEmail($email);
+            $user->setPwd($pwd);
+            $user->setStatus(0); // Ou une autre valeur par défaut
+            $user->setRole("user"); // Ou une autre valeur par défaut
            
             
 
