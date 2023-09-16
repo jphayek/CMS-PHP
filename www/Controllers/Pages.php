@@ -178,9 +178,6 @@ class Pages {
     
         header('Location: /pages');  // Redirige l'utilisateur vers la liste des pages
     }
-    
-
-
 
 
 public function show(): void
